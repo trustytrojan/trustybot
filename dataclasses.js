@@ -1,19 +1,14 @@
-import { readFileSync, writeFileSync } from "fs";
-import { Collection } from "discord.js";
+import { readFileSync, writeFileSync, existsSync } from "fs";
+import { Collection, EmbedBuilder } from "discord.js";
+import { setReadonly } from "./util.js";
 import assert from "assert";
-
-/**
- * @param {string} path 
- */
-const readJsonFile = (path) => JSON.parse(readFileSync(path).toString());
-
-/**
- * @param {string} key 
- */
-const setReadonly = (o, key) => Object.defineProperty(o, key, { writable: false });
 
 export class TGuild {
 	static PATH = "tguilds.json";
+
+	/**
+	 * Note: the `this` keyword used within `static` functions refers to the class itself, not any instances.
+	 */
 
 	/**
 	 * @returns {Collection<string, TGuild>}
@@ -23,76 +18,57 @@ export class TGuild {
 			return new Collection();
 		}
 
-		/** @type {TGuild[]} */
 		let tguilds;
 
 		try {
-			tguilds = readJsonFile(this.PATH);
+			tguilds = JSON.parse(readFileSync(path, "utf8"));
 		} catch (err) {
 			return new Collection();
 		}
 
 		assert(tguilds instanceof Array);
-		return new Collection(tguilds.map(tg => [tg.guild, tg]));
+		
+		for (let i = 0; i < tguilds.length; ++i) {
+			const tg = tguilds[i];
+			this.assert(tg);
+			setReadonly(tg, "guild");
+
+			// this assignment prepares tguilds for the Collection constructor
+			tguilds[i] = [tg.guild, tg];
+		}
+		
+		return new Collection(tguilds);
 	}
 
 	/**
 	 * @param {Collection<string, TGuild>} tguilds 
 	 */
 	static save(tguilds) {
+		assert(tguilds instanceof Collection);
 		writeFileSync(this.PATH, JSON.stringify(tguilds));
 	}
 
 	/**
-	 * @param {string} guild guild id
+	 * Asserts whether an object is a TGuild by type.
+	 * @param {object} o
+	 */
+	static assert(o) {
+		assert(typeof o === "object");
+		assert(typeof o.guild === "string");
+		assert(typeof o.embedColor === "string");
+		assert(typeof o.logging === "object");
+		assert(typeof o.logging.enabled === "boolean");
+		assert(o.logging.channel === null || typeof o.logging.channel === "string");
+	}
+
+	/**
+	 * @param {string} guild 
 	 */
 	constructor(guild) {
-		this.guild = guild; setReadonly(this, "guild");
-		this.color = "ff00ff";
+		assert(typeof guild === "string");
+		this.guild = guild;
+		setReadonly(this, "guild");
+		this.embedColor = "ff00ff";
+		this.logging = { enabled: false, channel: null };
 	}
 }
-
-export class UserProfile {
-	static PATH = "profiles.json";
-
-	/**
-	 * @returns {Collection<string, UserProfile>}
-	 */
-	static load() {
-		if (!existsSync(this.PATH)) {
-			return new Collection();
-		}
-
-		/** @type {UserProfile[]} */
-		let profiles;
-
-		try {
-			profiles = JSON.parse(readFileSync(this.PATH).toString());
-		} catch (err) {
-			return new Collection();
-		}
-
-		assert(profiles instanceof Array);
-		return new Collection(profiles.map(profile => [profile.user, profile]));
-	}
-
-	/**
-	 * 
-	 * @param {Collection<string, UserProfile>} profiles 
-	 */
-	static save(profiles) {
-		writeFileSync(this.PATH, JSON.stringify(profiles));
-	}
-
-	/**
-	 * @param {string} user user id
-	 */
-	constructor(user) {
-		this.user = user;
-		this.color = "ff00ff";
-		this.description = "*Empty description*";
-	}
-}
-
-Object.freeze(TGuild);
-Object.freeze(UserProfile);

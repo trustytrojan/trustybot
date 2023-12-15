@@ -1,28 +1,38 @@
 import { Client } from "discord.js";
 import { readFileSync } from "fs";
-import importModules from "./importModules.js";
-import assert from "assert";
+import { loadCommandModules } from "./util.js";
+import { TGuild } from "./dataclasses.js";
+import { setReadonly } from "./util.js";
+import "./prototypes.js";
 
-let client = new Client({
+/** @type {Trustybot} */
+const client = new Client({
 	intents: [
 		"Guilds",
 		"GuildMessages"
 	]
 });
 
-const commands = await importModules("./commands");
+setReadonly(client, "tguilds", TGuild.load());
+const commandModules = await loadCommandModules();
 
-client.on("ready", async client => {
-	assert((await client.application.fetch()).owner instanceof User);
-
+client.on("ready", client => {
+	// client.application.commands.set(Object.values(commandModules).map(command => command.data))
+	// 	.then(() => console.log("Set commands"));
 });
 
 client.on("interactionCreate", async interaction => {
-	if (!interaction.inCachedGuild()) return;
 	if (interaction.isChatInputCommand())
-		commands[interaction.commandName].callback(client, interaction);
+		commandModules[interaction.commandName].callback(client, interaction);
 });
 
-client.login(readFileSync("token").toString()).then(async () => {
-	assert((await client.application.fetch()).owner instanceof User);
-});
+const handleExit = async () => {
+	await client.destroy();
+	TGuild.save(client.tguilds);
+	process.exit();
+};
+
+process.on("exit", handleExit);
+process.on("SIGINT", handleExit);
+
+client.login(readFileSync("token").toString());

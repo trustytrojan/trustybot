@@ -5,8 +5,5 @@ export function callback(client, interaction) {
 
 /** @type {import("discord.js").APIApplicationCommand} */
 export const data = {
-	name: "ping",
 	description: "ping",
 };
-
-Object.freeze(data);
