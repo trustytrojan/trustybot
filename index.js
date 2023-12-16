@@ -1,4 +1,4 @@
 new (await import("./Trustybot.js")).default({
-	intents: ["Guilds"],
+	intents: ["Guilds", "GuildMembers", "GuildModeration"],
 	tokenPath: "./token"
 });

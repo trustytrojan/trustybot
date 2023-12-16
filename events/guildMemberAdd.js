@@ -1,9 +1,7 @@
 import { TextChannel, time } from "discord.js";
 import assert from "assert";
 
-/**
- * @param {import("discord.js").GuildMember & { client: Trustybot }} member
- */
+/** @param {import("discord.js").GuildMember & { client: import("../Trustybot.js").default }} */
 export default async ({ client, guild, user }) => {
 	const tg = client.tguilds.get(guild.id);
 	if (!tg?.logging.enabled) return;

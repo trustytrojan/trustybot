@@ -44,7 +44,7 @@ export default class Trustybot extends Client {
 			this.on(name, callback);
 		}
 
-		process.on("uncaughtException", (err) => { this.handleError(err).then(this.handleExit.bind(this)); });
+		process.on("uncaughtException", (err) => { this.handleError(err); this.handleExit(); });
 		this.on("error", this.handleError.bind(this));
 
 		/**
@@ -60,9 +60,9 @@ export default class Trustybot extends Client {
 	/**
 	 * @param {Error} err 
 	 */
-	async handleError(err) {
+	handleError(err) {
 		console.error(err);
-		await this.application.owner.send(`\`\`\`${err.stack}\`\`\``);
+		this.application.owner.send(`\`\`\`${err.stack}\`\`\``).catch(() => {});
 	}
 
 	async handleExit() {

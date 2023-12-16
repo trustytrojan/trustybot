@@ -66,9 +66,14 @@ export default class TGuild {
 	 */
 	constructor(guild) {
 		assert(typeof guild === "string");
-		this.guild = guild;
-		setReadonly(this, "guild");
+		setReadonly(this, "guild", guild);
+
+		/** @type {string} */
+		this.guild;
+		
 		this.embedColor = "ff00ff";
+
+		/** @type {{ enabled: boolean, channel: string? }} */
 		this.logging = { enabled: false, channel: null };
 	}
 }
