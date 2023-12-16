@@ -1,9 +1,9 @@
 import { readFileSync, writeFileSync, existsSync } from "fs";
-import { Collection, EmbedBuilder } from "discord.js";
+import { Collection } from "discord.js";
 import { setReadonly } from "./util.js";
 import assert from "assert";
 
-export class TGuild {
+export default class TGuild {
 	static PATH = "tguilds.json";
 
 	/**
@@ -33,7 +33,7 @@ export class TGuild {
 			this.assert(tg);
 			setReadonly(tg, "guild");
 
-			// this assignment prepares tguilds for the Collection constructor
+			// this assignment prepares the array for the Collection constructor
 			tguilds[i] = [tg.guild, tg];
 		}
 		

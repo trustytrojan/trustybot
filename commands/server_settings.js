@@ -1,12 +1,12 @@
 import { ApplicationCommandOptionType, ChannelType, EmbedBuilder, resolveColor } from "discord.js";
-import { TGuild } from "../dataclasses.js";
+import TGuild from "../TGuild.js";
 
-/** @type {ChatInputCommandCallback} */
-export async function callback(client, interaction) {
+/** @param {import("discord.js").ChatInputCommandInteraction & { client: import("../Trustybot.js").default }} interaction */
+export async function callback(interaction) {
 	// don't deal with uncached guilds
 	if (!interaction.inCachedGuild()) return;
 
-	const { options, guild, guildId, member } = interaction;
+	const { client, options, guild, guildId, member } = interaction;
 	const tg = client.tguilds.ensure(guildId, () => new TGuild(guildId));
 	
 	const embed = new EmbedBuilder({
@@ -32,7 +32,7 @@ export async function callback(client, interaction) {
 		);
 	} else {
 		if (!member.permissions.has("ManageGuild")) {
-			interaction.reply("you don't have `Manage Server` perms!");
+			interaction.replyEphemeral("you don't have `Manage Server` perms!");
 			return;
 		}
 
@@ -42,7 +42,7 @@ export async function callback(client, interaction) {
 		if (value = options.getString("embed_color")) {
 			try { // Verify that the value is a hex color code
 				resolveColor(value);
-				fieldValue = `${tg.embedColor} ➡️ ${tg.embedColor = value}`;
+				fieldValue = `\`${tg.embedColor}\` ➡️ \`${tg.embedColor = value}\``;
 			} catch (err) {
 				fieldValue = `**error:** \`${value}\` is not a hex color code`;
 			}
@@ -56,7 +56,7 @@ export async function callback(client, interaction) {
 			if (value = options.getChannel("channel", false, [ChannelType.GuildText])) {
 				try {
 					await value.send("i will now send logging messages here!");
-					fieldValue = `<#${tg.logging.channel}> ➡️ <#${tg.logging.channel = value.id}>`;
+					fieldValue = `${tg.logging.channel ? `<#${tg.logging.channel}>` : "(not set)"} ➡️ <#${tg.logging.channel = value.id}>`;
 				} catch (err) {
 					fieldValue = `**error:** i cannot send messages in ${value}`;
 				}
@@ -66,13 +66,13 @@ export async function callback(client, interaction) {
 		}
 	}
 
-	interaction.replyEmbed(embed);
+	interaction.reply({ embeds: [embed] });
 }
 
 /** @type {import("discord.js").APIApplicationCommand} */
 export const data = {
 	dm_permission: false,
-	description: "change server settings",
+	description: "change or view server settings",
 	options: [
 		{
 			type: ApplicationCommandOptionType.Subcommand,

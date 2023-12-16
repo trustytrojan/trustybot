@@ -1,5 +1,5 @@
-/** @type {ChatInputCommandCallback} */
-export function callback(client, interaction) {
+/** @param {import("discord.js").ChatInputCommandInteraction & { client: import("../Trustybot.js").default }} interaction */
+export function callback(interaction) {
 	interaction.reply("pong");
 }
 
