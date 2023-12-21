@@ -2,12 +2,15 @@
  * @param {import("discord.js").Interaction & { client: Trustybot }} interaction
  */
 export default (interaction) => {
+	const { client } = interaction;
 	try {
 		if (interaction.isChatInputCommand())
-			interaction.client.commands[interaction.commandName].callback(interaction);
+			client.commands[interaction.commandName].callback(interaction);
+		if (interaction.isChannelSelectMenu())
+			client.emit("channelSelectMenu", interaction);
 	} catch (err) {
 		if (interaction.isRepliable())
 			interaction.reply(`**this is an error**\`\`\`js\n${err.stack}\`\`\``);
-		interaction.client.handleError(err);
+		client.handleError(err);
 	}
 };

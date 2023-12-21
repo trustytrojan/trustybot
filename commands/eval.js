@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType } from "discord.js";
 import { inspect } from "util";
 
-/** @param {import("discord.js").ChatInputCommandInteraction & { client: import("../Trustybot.js").default }} interaction */
+/** @param {TbChatInputCommandInteraction} interaction */
 export async function callback(interaction) {
 	const { options, user, client } = interaction;
 	if (user.id !== client.owner?.id) return;

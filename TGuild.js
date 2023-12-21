@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync, existsSync } from "fs";
-import { Collection } from "discord.js";
+import { Collection, TextChannel, resolveColor } from "discord.js";
 import { setReadonly } from "./util.js";
 import assert from "assert";
 
@@ -13,7 +13,7 @@ export default class TGuild {
 	/**
 	 * @returns {Collection<string, TGuild>}
 	 */
-	static load() {
+	static loadTGuilds() {
 		if (!existsSync(this.PATH)) {
 			return new Collection();
 		}
@@ -43,7 +43,7 @@ export default class TGuild {
 	/**
 	 * @param {Collection<string, TGuild>} tguilds 
 	 */
-	static save(tguilds) {
+	static saveTGuilds(tguilds) {
 		assert(tguilds instanceof Collection);
 		writeFileSync(this.PATH, JSON.stringify(tguilds));
 	}
@@ -56,9 +56,7 @@ export default class TGuild {
 		assert(typeof o === "object");
 		assert(typeof o.guild === "string");
 		assert(typeof o.embedColor === "string");
-		assert(typeof o.logging === "object");
-		assert(typeof o.logging.enabled === "boolean");
-		assert(o.logging.channel === null || typeof o.logging.channel === "string");
+		assert(o.logChannel === null || typeof o.logChannel === "string");
 	}
 
 	/**
@@ -73,7 +71,55 @@ export default class TGuild {
 		
 		this.embedColor = "ff00ff";
 
-		/** @type {{ enabled: boolean, channel: string? }} */
-		this.logging = { enabled: false, channel: null };
+		/** @type {string?} */
+		this.logChannel = null;
+	}
+
+	get logChannelString() {
+		return this.logChannel ? `<#${this.logChannel}>` : "(not set)"
+	}
+
+	/**
+	 * @param {string} value 
+	 * @returns a field value used in the "Changing server settings" embed
+	 */
+	embed_color(value) {
+		try { // Verify that the value is a hex color code
+			resolveColor(value);
+			return `\`${this.embedColor}\` ➡️ \`${this.embedColor = value}\``;
+		} catch (err) {
+			return `**error:** \`${value}\` is not a hex color code`;
+		}
+	}
+
+	/**
+	 * @param {string} value 
+	 * @param {TbChatInputCommandInteraction} 
+	 * @returns a field value used in the "Changing server settings" embed
+	 */
+	async log_channel(value, { guild }) {
+		if (value === "clear") {
+			return `${this.logChannelString} ➡️ (not set)`;
+		}
+
+		const id = value.replace("<", "").replace("#", "").replace(">", "");
+
+		let channel;
+		try {
+			channel = await guild.channels.fetch(id);
+		} catch (err) {
+			return `**error:** \`${value}\` is not a channel mention`;
+		}
+
+		if (!(channel instanceof TextChannel)) {
+			return `**error:** channel ${value} is not a text channel`;
+		}
+
+		try {
+			await channel.send("server logs will be sent here!");
+			return `${this.logChannelString} ➡️ <#${this.logChannel = id}>`;
+		} catch (err) {
+			return `**error:** i cannot send messages in ${value}`;
+		}
 	}
 }

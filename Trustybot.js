@@ -14,10 +14,14 @@ export default class Trustybot extends Client {
 	constructor({ intents, tokenPath }) {
 		assert(intents instanceof Array);
 		assert(typeof tokenPath === "string");
+		
 		super({ intents });
-		this.tguilds = TGuild.load();
+		
+		this.tguilds = TGuild.loadTGuilds();
+		
 		/** @type {import("discord.js").User?} */
 		this.owner = null;
+
 		this.loadCommands()
 			.then(this.registerEventListeners.bind(this))
 			.then(() => this.login(readFileSync(tokenPath, "utf8")));
@@ -62,13 +66,13 @@ export default class Trustybot extends Client {
 	 */
 	handleError(err) {
 		console.error(err);
-		this.application.owner.send(`\`\`\`${err.stack}\`\`\``).catch(() => {});
+		this.owner?.send(`\`\`\`${err.stack}\`\`\``).catch(() => {});
 	}
 
 	async handleExit() {
 		await this.destroy();
 		console.log("Destroyed client");
-		TGuild.save(this.tguilds);
+		TGuild.saveTGuilds(this.tguilds);
 		console.log("Saved TGuilds");
 		process.exit();
 	}
