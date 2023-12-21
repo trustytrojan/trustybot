@@ -1,30 +1,31 @@
 import { Client } from "discord.js";
-import { readFileSync, readdirSync } from "fs";
+import { readdirSync } from "fs";
 import TGuild from "./TGuild.js";
 import assert from "assert";
 import "./prototypes.js";
+import secrets from "./secrets.json" assert { type: "json" };
 
 export default class Trustybot extends Client {
 	/**
 	 * @param {{ 
 	 *   intents: import("discord.js").GatewayIntentsString[],
-	 *   tokenPath: string
+	 *   tguilds: import("mongodb").Collection<import("mongodb").Document>
 	 * }}
 	 */
-	constructor({ intents, tokenPath }) {
+	constructor({ intents, tguilds }) {
 		assert(intents instanceof Array);
 		assert(typeof tokenPath === "string");
 		
 		super({ intents });
 		
-		this.tguilds = TGuild.loadTGuilds();
+		this.tguilds = tguilds;
 		
 		/** @type {import("discord.js").User?} */
 		this.owner = null;
 
 		this.loadCommands()
 			.then(this.registerEventListeners.bind(this))
-			.then(() => this.login(readFileSync(tokenPath, "utf8")));
+			.then(() => this.login(secrets.discord));
 	}
 
 	async loadCommands() {
