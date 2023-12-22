@@ -1,4 +1,4 @@
-import secrets from "./secrets.json" assert { type: "json" };
+import { Collection } from "discord.js";
 import { MongoClient } from "mongodb";
 
 const defaultTGuild = {
@@ -6,52 +6,71 @@ const defaultTGuild = {
 	logChannel: null
 };
 
+/**
+ * @typedef {object} TGuildDocument
+ * @prop {string} _id
+ * @prop {string} embedColor
+ * @prop {string?} logChannel
+ */
+
 class TGuildWrapper {
-	constructor(_id) {
-		this._id = _id;
+	/** @param {TGuildDocument} doc */
+	constructor(doc) {
+		this._id = doc._id;
+		this.embedColor = doc.embedColor;
+		this.logChannel = doc.logChannel;
 	}
 
-	/**
-	 * WHAT TO DO WITH TGUILD CLASS NOW THAT MONGODB WORKS?
-	 * 
-	 * DECIDE PLEASE
-	 */
-
-	get embedColor() {
-		return TGuildDb.get(this._id).then(o => o.embedColor);
+	/** @param {string} embedColor */
+	setEmbedColor(embedColor) {
+		this.embedColor = embedColor;
+		return TGuildDb.update(this._id, { embedColor });
 	}
 
-	set embedColor(val) {
-		TGuildDb.set(this._id, { embedColor: val });
-	}
-
-	get logChannel() {
-		return TGuildDb.get(this._id).then(o => o.logChannel);
+	/** @param {string?} logChannel */
+	setLogChannel(logChannel) {
+		this.logChannel = logChannel;
+		return TGuildDb.update(this._id, { logChannel });
 	}
 }
 
 export default class TGuildDb {
 	static async init() {
-		this.client = await MongoClient.connect(`mongodb+srv://t:${secrets.mongodb}@cluster0.11u8ijc.mongodb.net/?retryWrites=true&w=majority`);
+		const { mongodb } = await import("./secrets.json", { with: { type: "json" } });
+		this.client = await MongoClient.connect(`mongodb+srv://t:${mongodb}@cluster0.11u8ijc.mongodb.net/?retryWrites=true&w=majority`);
 		this.coll = this.client.db("tguilds").collection("tguilds");
+		this.cache = new Collection((await this.coll.find().toArray()).map(o => [o._id, o]));
 	}
 
-	/**
-	 * @param {string} _id guild id
-	 * @returns {Promise<import("mongodb").WithId<import("mongodb").Document>>}
-	 */
-	static ensure(_id) {
-		return this.coll.findOneAndUpdate({ _id }, { $setOnInsert: { _id, ...defaultTGuild } }, { upsert: true, returnDocument: "after" });
+	static close() {
+		return this.client.close();
 	}
 
 	/**
 	 * @param {string} _id guild id
 	 */
-	static get(_id) {
-		return this.coll.findOne({ _id });
+	static async ensure(_id) {
+		const doc = await this.coll.findOneAndUpdate({ _id }, { $setOnInsert: { _id, ...defaultTGuild } }, { upsert: true, returnDocument: "after" });
+		return new TGuildWrapper(doc);
 	}
 
-	static set(_id, $set) {
+	/**
+	 * @param {string} _id guild id
+	 */
+	static async find(_id) {
+		const doc = await this.coll.findOne({ _id });
+		if (!doc) return null;
+		return new TGuildWrapper(doc);
+	}
+
+	/**
+	 * @param {string} _id guild id
+	 * @param {*} $set object with entries to modify
+	 */
+	static update(_id, $set) {
+		const tg = this.cache.get(_id);
+		for (const k in $set)
+			{} 
 		return this.coll.updateOne({ _id }, { $set });
 	}
 }
