@@ -7,19 +7,13 @@ import secrets from "./secrets.json" assert { type: "json" };
 
 export default class Trustybot extends Client {
 	/**
-	 * @param {{ 
-	 *   intents: import("discord.js").GatewayIntentsString[],
-	 *   tguilds: import("mongodb").Collection<import("mongodb").Document>
-	 * }}
+	 * @param {import("discord.js").GatewayIntentsString[]} intents
 	 */
-	constructor({ intents, tguilds }) {
-		assert(intents instanceof Array);
-		assert(typeof tokenPath === "string");
-		
+	constructor(...intents) {
 		super({ intents });
-		
-		this.tguilds = tguilds;
-		
+
+		this.tguilds = TGuild.loadTGuilds();
+
 		/** @type {import("discord.js").User?} */
 		this.owner = null;
 
@@ -67,7 +61,7 @@ export default class Trustybot extends Client {
 	 */
 	handleError(err) {
 		console.error(err);
-		this.owner?.send(`\`\`\`${err.stack}\`\`\``).catch(() => {});
+		this.owner?.send(`\`\`\`${err.stack}\`\`\``).catch(() => { });
 	}
 
 	async handleExit() {

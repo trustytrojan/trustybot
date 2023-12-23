@@ -1,5 +1,5 @@
 import { MongoClient } from "mongodb";
-import secrets from "./secrets.json" assert { type: "json" };
+import secrets from "../secrets.json" assert { type: "json" };
 import repl from "repl";
 
 const uri = `mongodb+srv://t:${secrets.mongodb}@cluster0.11u8ijc.mongodb.net/?retryWrites=true&w=majority`;

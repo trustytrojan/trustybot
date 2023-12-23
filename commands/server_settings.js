@@ -19,11 +19,19 @@ export async function callback(interaction) {
 		embed.addFields(
 			{
 				name: "Embed color",
-				value: `\`${tg.embedColor}\`\n*Default color of embeds*`
+				value: `Currently set to: \`${tg.embedColor}\`\n*Default color of embeds*`
 			},
 			{
-				name: `Log channel`,
-				value: `${tg.logChannelString}\n*Channel for sending server event logs*`
+				name: "Log channel",
+				value: `Currently set to: ${tg.logChannelString}\n*Channel for sending server event logs*`
+			},
+			{
+				name: "Bump reminder channel",
+				value: `Currently set to: ${tg.bumpChannelString}\n*Channel where Disboard bumps are, so I can remind people*`
+			},
+			{
+				name: "Counting channel",
+				value: `Currently set to: ${tg.countChannelString}\n*Self-explanatory*`
 			}
 		);
 	} else {

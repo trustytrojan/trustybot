@@ -7,10 +7,6 @@ export default class TGuild {
 	static PATH = "tguilds.json";
 
 	/**
-	 * Note: the `this` keyword used within `static` functions refers to the class itself, not any instances.
-	 */
-
-	/**
 	 * @returns {Collection<string, TGuild>}
 	 */
 	static loadTGuilds() {
@@ -21,8 +17,9 @@ export default class TGuild {
 		let tguilds;
 
 		try {
-			tguilds = JSON.parse(readFileSync(path, "utf8"));
+			tguilds = JSON.parse(readFileSync(this.PATH, "utf8"));
 		} catch (err) {
+			assert(err instanceof SyntaxError);
 			return new Collection();
 		}
 
@@ -73,11 +70,27 @@ export default class TGuild {
 
 		/** @type {string?} */
 		this.logChannel = null;
+
+		/** @type {string?} */
+		this.bumpChannel = null;
+
+		/** @type {string?} */
+		this.countChannel = null;
 	}
 
 	get logChannelString() {
-		return this.logChannel ? `<#${this.logChannel}>` : "(not set)"
+		return this.logChannel ? `<#${this.logChannel}>` : "(not set)";
 	}
+
+	get bumpChannelString() {
+		return this.bumpChannel ? `<#${this.bumpChannel}>` : "(not set)";
+	}
+
+	get countChannelString() {
+		return this.countChannel ? `<#${this.countChannel}>` : "(not set)";
+	}
+
+	/* The following methods are designed to be called by the code of the `/server_settings` command. */
 
 	/**
 	 * @param {string} value 
@@ -99,7 +112,9 @@ export default class TGuild {
 	 */
 	async log_channel(value, { guild }) {
 		if (value === "clear") {
-			return `${this.logChannelString} ➡️ (not set)`;
+			const str = this.logChannelString;
+			this.logChannel = null;
+			return `${str} ➡️ (not set)`;
 		}
 
 		const id = value.replace("<", "").replace("#", "").replace(">", "");

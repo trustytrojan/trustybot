@@ -36,7 +36,7 @@ class TGuildWrapper {
 
 export default class TGuildDb {
 	static async init() {
-		const { mongodb } = await import("./secrets.json", { with: { type: "json" } });
+		const { mongodb } = await import("../secrets.json", { with: { type: "json" } });
 		this.client = await MongoClient.connect(`mongodb+srv://t:${mongodb}@cluster0.11u8ijc.mongodb.net/?retryWrites=true&w=majority`);
 		this.coll = this.client.db("tguilds").collection("tguilds");
 		this.cache = new Collection((await this.coll.find().toArray()).map(o => [o._id, o]));
