@@ -7,3 +7,9 @@
  * @prop {(_: TbChatInputCommandInteraction) => *} callback
  * @prop {import("discord.js").APIApplicationCommand} data
  */
+
+/**
+ * @callback ServerSettingsOptionCheck
+ * @param {string} value 
+ * @param {TbChatInputCommandInteraction} 
+ */

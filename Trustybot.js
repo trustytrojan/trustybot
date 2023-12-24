@@ -6,11 +6,8 @@ import "./prototypes.js";
 import secrets from "./secrets.json" assert { type: "json" };
 
 export default class Trustybot extends Client {
-	/**
-	 * @param {import("discord.js").GatewayIntentsString[]} intents
-	 */
-	constructor(...intents) {
-		super({ intents });
+	constructor() {
+		super({ intents: ["Guilds", "GuildMembers"] });
 
 		this.tguilds = TGuild.loadTGuilds();
 
@@ -66,9 +63,7 @@ export default class Trustybot extends Client {
 
 	async handleExit() {
 		await this.destroy();
-		console.log("Destroyed client");
 		TGuild.saveTGuilds(this.tguilds);
-		console.log("Saved TGuilds");
 		process.exit();
 	}
 }

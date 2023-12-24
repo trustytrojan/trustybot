@@ -1,1 +1,1 @@
-new (await import("./Trustybot.js")).default("Guilds", "GuildMembers");
+new (await import("./Trustybot.js")).default;

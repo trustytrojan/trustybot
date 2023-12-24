@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { Collection, TextChannel, resolveColor } from "discord.js";
-import { setReadonly } from "./util.js";
+import { extractChannelId, setReadonly } from "./util.js";
 import assert from "assert";
 
 export default class TGuild {
@@ -105,23 +105,39 @@ export default class TGuild {
 		}
 	}
 
+	/** @type {ServerSettingsOptionCheck} */
+	log_channel(value, { guild }) {
+		return this.ssTextChannel("log", value, guild, (c) => c.trySend("server logs will be sent here!"), (c) => `i cannot send messages in ${c}`);
+	}
+
+	/** @type {ServerSettingsOptionCheck} */
+	bump_channel(value, { guild }) {
+		return this.ssTextChannel("bump", value, guild, (c) => c.trySend("bump reminders will be sent here!"), (c) => `i cannot send messages in ${c}`);
+	}
+
+	/** @type {ServerSettingsOptionCheck} */
+	count_channel(value, { guild }) {
+		return this.ssTextChannel("count", value, guild, (c) => c.viewable, (c) => `i cannot view ${c}`);
+	}
+
 	/**
-	 * @param {string} value 
-	 * @param {TbChatInputCommandInteraction} 
+	 * @param {"log" | "bump" | "count"} channelType
+	 * @param {string} value The value of the interaction option
+	 * @param {import("discord.js").Guild} guild 
+	 * @param {(_: TextChannel) => Promise<boolean>} channelVerifier
+	 * @param {(_: TextChannel) => string} failMessage
 	 * @returns a field value used in the "Changing server settings" embed
 	 */
-	async log_channel(value, { guild }) {
+	async ssTextChannel(channelType, value, guild, channelVerifier, failMessage) {
 		if (value === "clear") {
-			const str = this.logChannelString;
-			this.logChannel = null;
-			return `${str} ➡️ (not set)`;
+			return this.ssClearChannel(channelType);
 		}
 
-		const id = value.replace("<", "").replace("#", "").replace(">", "");
-
+		const channelId = extractChannelId(value);
 		let channel;
+
 		try {
-			channel = await guild.channels.fetch(id);
+			channel = await guild.channels.fetch(channelId);
 		} catch (err) {
 			return `**error:** \`${value}\` is not a channel mention`;
 		}
@@ -130,11 +146,21 @@ export default class TGuild {
 			return `**error:** channel ${value} is not a text channel`;
 		}
 
-		try {
-			await channel.send("server logs will be sent here!");
-			return `${this.logChannelString} ➡️ <#${this.logChannel = id}>`;
-		} catch (err) {
-			return `**error:** i cannot send messages in ${value}`;
+		if (!await channelVerifier(channel)) {
+			return `**error:** ${failMessage(channel)}`;
 		}
+
+		return `${this[channelType + "ChannelString"]} ➡️ <#${this[channelType + "Channel"] = channelId}>`;
+	}
+
+	/**
+	 * Sets `this[channelType + "Channel"]` to `null`.
+	 * @param {"log" | "bump" | "count"} channelType 
+	 * @returns a field value used in the "Changing server settings" embed
+	 */
+	ssClearChannel(channelType) {
+		const str = this[channelType + "ChannelString"];
+		this[channelType + "Channel"] = null;
+		return `${str} ➡️ (not set)`;
 	}
 }

@@ -57,13 +57,23 @@ export const data = {
 	options: [
 		{
 			type: ApplicationCommandOptionType.String,
+			name: "embed_color",
+			description: "set the default embed color",
+		},
+		{
+			type: ApplicationCommandOptionType.String,
 			name: "log_channel",
 			description: `the server's log channel. to set: mention a channel; to clear: type "clear"`
 		},
 		{
 			type: ApplicationCommandOptionType.String,
-			name: "embed_color",
-			description: "set the default embed color",
+			name: "bump_channel",
+			description: `the server's bump reminder channel. to set: mention a channel; to clear: type "clear"`
+		},
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "count_channel",
+			description: `the server's counting channel. to set: mention a channel; to clear: type "clear"`
 		}
 	]
 };

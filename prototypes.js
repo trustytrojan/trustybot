@@ -1,5 +1,8 @@
-import { CommandInteraction } from "discord.js";
+import { CommandInteraction, TextChannel } from "discord.js";
 
+/**
+ * @param {string | import("discord.js").InteractionReplyOptions} x 
+ */
 CommandInteraction.prototype.replyEphemeral = function(x) {
 	/** @type {import("discord.js").InteractionReplyOptions} */
 	let obj = {};
@@ -9,4 +12,12 @@ CommandInteraction.prototype.replyEphemeral = function(x) {
 		obj = x;
 	obj.ephemeral = true;
 	return this.reply(obj);
+};
+
+/**
+ * @param {string | import("discord.js").MessageCreateOptions} message 
+ */
+TextChannel.prototype.trySend = async function(message) {
+	try { return await this.send(message); }
+	catch (err) {}
 };
