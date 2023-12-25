@@ -7,19 +7,18 @@ import { User } from "discord.js";
 export default (client) => {
 	console.log(`Logged in as ${client.user.tag}`);
 	
-	client.application.fetch()
-		.then(({ owner }) => {
-			assert(owner instanceof User);
-			client.owner = owner;
-			console.log("Fetched owner");
-		});
+	client.application.fetch().then(({ owner }) => {
+		assert(owner instanceof User);
+		client.owner = owner;
+		console.log("Fetched owner");
+	});
 
 	const commandData = Object.values(client.commands).map(command => command.data);
 
-	// client.application.commands.set([])
-	// 	.then(() => console.log("Set global commands"));
+	// client.application.commands.set([]).then(() => console.log("Set global commands"));
 	
-	client.guilds.fetch("1184967287439106098")
-		.then(g => g.commands.set(commandData))
-		.then(() => console.log("Set test server commands"));
+	// client.guilds.fetch("1184967287439106098").then(async guild => {
+	// 	await guild.commands.set(commandData);
+	// 	console.log("Set test server commands");
+	// });
 };

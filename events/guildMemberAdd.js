@@ -13,7 +13,7 @@ export default async ({ client, guild, user }) => {
 		fields: [
 			{ name: "Username", value: user.tag, inline: true },
 			{ name: "Mention", value: user.toString(), inline: true },
-			{ name: "Account created", value: time(user.createdTimestamp, "R") }
+			{ name: "Account created", value: time(Math.round(user.createdTimestamp / 1_000), "R") }
 		]
 	}] });
 };

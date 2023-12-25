@@ -1,4 +1,4 @@
-import { Client } from "discord.js";
+import { Client, Collection } from "discord.js";
 import { readdirSync } from "fs";
 import TGuild from "./TGuild.js";
 import assert from "assert";
@@ -7,9 +7,11 @@ import secrets from "./secrets.json" assert { type: "json" };
 
 export default class Trustybot extends Client {
 	constructor() {
-		super({ intents: ["Guilds", "GuildMembers"] });
+		super({ intents: ["Guilds", "GuildMembers", "GuildMessages", "MessageContent"] });
 
 		this.tguilds = TGuild.loadTGuilds();
+
+		this.bumpReminders = new Collection();
 
 		/** @type {import("discord.js").User?} */
 		this.owner = null;
@@ -40,7 +42,7 @@ export default class Trustybot extends Client {
 			this.on(name, callback);
 		}
 
-		process.on("uncaughtException", (err) => { this.handleError(err); this.handleExit(); });
+		process.on("uncaughtException", (err) => this.handleError(err).then(this.handleExit.bind(this)));
 		this.on("error", this.handleError.bind(this));
 
 		/**
@@ -56,14 +58,16 @@ export default class Trustybot extends Client {
 	/**
 	 * @param {Error} err 
 	 */
-	handleError(err) {
+	async handleError(err) {
 		console.error(err);
-		this.owner?.send(`\`\`\`${err.stack}\`\`\``).catch(() => { });
+		return this.owner?.send(`\`\`\`js\n${err.stack}\`\`\``).catch(() => {});
 	}
 
 	async handleExit() {
 		await this.destroy();
+		console.log("Destroyed client");
 		TGuild.saveTGuilds(this.tguilds);
+		console.log("Saved TGuilds");
 		process.exit();
 	}
 }

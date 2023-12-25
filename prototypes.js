@@ -18,6 +18,5 @@ CommandInteraction.prototype.replyEphemeral = function(x) {
  * @param {string | import("discord.js").MessageCreateOptions} message 
  */
 TextChannel.prototype.trySend = async function(message) {
-	try { return await this.send(message); }
-	catch (err) {}
+	try { return await this.send(message); } catch {}
 };

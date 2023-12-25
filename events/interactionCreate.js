@@ -1,5 +1,5 @@
 /**
- * @param {import("discord.js").Interaction & { client: Trustybot }} interaction
+ * @param {import("discord.js").Interaction & { client: import("../Trustybot").default }} interaction
  */
 export default (interaction) => {
 	const { client } = interaction;

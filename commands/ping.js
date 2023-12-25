@@ -1,6 +1,6 @@
 /** @param {TbChatInputCommandInteraction} interaction */
 export function callback(interaction) {
-	interaction.reply(`pong \`${interaction.client.ws.ping}ms\``);
+	interaction.reply("`" + interaction.client.ws.ping + "`");
 }
 
 /** @type {import("discord.js").APIApplicationCommand} */

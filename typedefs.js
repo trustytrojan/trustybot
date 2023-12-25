@@ -12,4 +12,6 @@
  * @callback ServerSettingsOptionCheck
  * @param {string} value 
  * @param {TbChatInputCommandInteraction} 
+ * @param {import("discord.js").EmbedBuilder} embed
+ * @returns {string}
  */

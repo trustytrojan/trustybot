@@ -2,12 +2,12 @@ import { ApplicationCommandOptionType, EmbedBuilder, resolveColor } from "discor
 import TGuild from "../TGuild.js";
 
 /** @param {TbChatInputCommandInteraction} interaction */
-export async function callback(interaction) {
+export const callback = async (interaction) => {
 	// don't deal with uncached guilds
 	if (!interaction.inCachedGuild()) return;
 
 	const { client, options, guild, guildId, member } = interaction;
-	const tg = client.tguilds.ensure(guildId, () => new TGuild(guildId));
+	const tg = client.tguilds.ensure(guildId, () => new TGuild());
 	
 	const embed = new EmbedBuilder({
 		color: resolveColor(tg.embedColor),
@@ -16,22 +16,23 @@ export async function callback(interaction) {
 	
 	if (options.data.length === 0) {
 		embed.setTitle("Server settings");
+		const makeFieldValue = (val, desc, wrap) => `**Value:** ${wrap ? `\`${val}\`` : val}\n*${desc}*`;
 		embed.addFields(
 			{
 				name: "Embed color",
-				value: `Currently set to: \`${tg.embedColor}\`\n*Default color of embeds*`
+				value: makeFieldValue(tg.embedColor, "Default color of embeds", true)
 			},
 			{
 				name: "Log channel",
-				value: `Currently set to: ${tg.logChannelString}\n*Channel for sending server event logs*`
+				value: makeFieldValue(tg.logChannelString, "Channel for sending server event logs")
 			},
 			{
 				name: "Bump reminder channel",
-				value: `Currently set to: ${tg.bumpChannelString}\n*Channel where Disboard bumps are, so I can remind people*`
+				value: makeFieldValue(tg.bumpChannelString, "Channel where Disboard bumps are, so I can remind people")
 			},
 			{
 				name: "Counting channel",
-				value: `Currently set to: ${tg.countChannelString}\n*Self-explanatory*`
+				value: makeFieldValue(tg.counting.channelString, "Self-explanatory")
 			}
 		);
 	} else {
@@ -43,7 +44,7 @@ export async function callback(interaction) {
 		embed.setTitle("Changing server settings");
 
 		for (const { name, value } of options.data) {
-			embed.addFields({ name, value: await tg[name](value, interaction) });
+			embed.addFields({ name, value: await tg[name](value, interaction, embed) });
 		}
 	}
 
@@ -72,7 +73,7 @@ export const data = {
 		},
 		{
 			type: ApplicationCommandOptionType.String,
-			name: "count_channel",
+			name: "counting_channel",
 			description: `the server's counting channel. to set: mention a channel; to clear: type "clear"`
 		}
 	]
