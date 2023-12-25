@@ -7,11 +7,6 @@ import { TextChannel } from "discord.js";
 export const extractChannelId = (s) => s.replaceAll(/<#|>/g, "");
 
 /**
- * @param {string} s 
- */
-export const isChannelId = (s) => s.match(/<#\d+>/g);
-
-/**
  * @param {string} mention Channel mention in the form `<#id>`
  * @param {import("discord.js").Guild | import("discord.js").Client} 
  * @returns {Promise<string | import("discord.js").TextChannel>}
