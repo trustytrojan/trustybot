@@ -1,4 +1,5 @@
-import { TextChannel, time } from "discord.js";
+import { TextChannel } from "discord.js";
+import { msToDiscordTimestamp } from "../util.js";
 import assert from "assert";
 
 /** @param {import("discord.js").GuildMember & { client: import("../Trustybot.js").default }} */
@@ -13,7 +14,7 @@ export default async ({ client, guild, user }) => {
 		fields: [
 			{ name: "Username", value: user.tag, inline: true },
 			{ name: "Mention", value: user.toString(), inline: true },
-			{ name: "Account created", value: time(Math.round(user.createdTimestamp / 1_000), "R") }
+			{ name: "Account created", value: msToDiscordTimestamp(user.createdTimestamp, "R") }
 		]
-	}] });
+	}] }).catch(client.boundHandleError);
 };

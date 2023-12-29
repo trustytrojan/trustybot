@@ -19,6 +19,9 @@ export default class Trustybot extends Client {
 		 */
 		this.owner = null;
 
+		/** @type {(err: Error) => Promise<void>} */
+		this.boundHandleError = this.handleError.bind(this);
+
 		Promise.all([this.loadCommands(), this.registerEventListeners()])
 			.then(() => import("./secrets.json", { with: { type: "json" } }))
 			.then(secrets => this.login(secrets.default.discord));
@@ -46,7 +49,7 @@ export default class Trustybot extends Client {
 		}
 
 		process.on("uncaughtException", (err) => this.handleError(err).then(this.handleExit.bind(this)));
-		this.on("error", this.handleError.bind(this));
+		this.on("error", this.boundHandleError);
 
 		/**
 		 * @param {this | NodeJS.Process} x 
@@ -63,7 +66,7 @@ export default class Trustybot extends Client {
 	 */
 	async handleError(err) {
 		console.error(err);
-		return this.owner?.send(`\`\`\`js\n${err.stack}\`\`\``).catch(doNothing);
+		this.owner?.send(`\`\`\`js\n${err.stack}\`\`\``).catch(doNothing);
 	}
 
 	async handleExit() {
