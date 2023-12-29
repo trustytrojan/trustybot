@@ -25,4 +25,6 @@ export const ssGetTextChannelFromMention = async (mention, { channels }) => {
  * @param {number} ms 
  * @param {import("discord.js").TimestampStylesString} style
  */
-export const formatMsTimestamp = (ms, style) => `<t:${ms}:${style}>`;
+export const formatMsTimestamp = (ms, style) => `<t:${Math.round(ms / 1000)}:${style}>`;
+
+export const doNothing = () => {};

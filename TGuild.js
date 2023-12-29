@@ -1,7 +1,6 @@
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { Collection } from "discord.js";
 import { ssGetTextChannelFromMention } from "./util.js";
-import assert from "assert";
 
 /**
  * @typedef {object} TgCounting
@@ -36,10 +35,18 @@ export default class TGuild {
 		let tguilds;
 		try { tguilds = JSON.parse(readFileSync(this.PATH, "utf8")) }
 		catch (err) {
-			assert(err instanceof SyntaxError);
-			return new Collection;
+			if (err instanceof SyntaxError)
+				return new Collection;
+			throw err;
 		}
 
+		/* imperative:
+		const entries = Object.entries(tguilds);
+		for (let i = 0; i < entries.length; ++i)
+			entries[i][1] = new TGuild(entries[i][1]);
+		return new Collection(entries); */
+
+		// functional:
 		return new Collection(Object.entries(tguilds).map(([k, v]) => [k, new TGuild(v)]));
 	}
 
@@ -54,16 +61,9 @@ export default class TGuild {
 
 	/** @param {TGuildData | undefined} o */
 	constructor(o = {}) {
-		/** @type {string} */
 		this.embedColor = o.embedColor ?? "ff00ff";
-
-		/** @type {string?} */
 		this.logChannel = o.logChannel ?? null;
-
-		/** @type {string?} */
 		this.bumpChannel = o.bumpChannel ?? null;
-
-		/** @type {TgCounting} */
 		this.counting = o.counting ?? {
 			channel: null,
 			count: 0,

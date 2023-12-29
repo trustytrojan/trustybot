@@ -3,7 +3,7 @@ import { readdirSync } from "fs";
 import TGuild from "./TGuild.js";
 import assert from "assert";
 import "./prototypes.js";
-import secrets from "./secrets.json" assert { type: "json" };
+import { doNothing } from "./util.js";
 
 export default class Trustybot extends Client {
 	constructor() {
@@ -13,12 +13,15 @@ export default class Trustybot extends Client {
 
 		this.bumpReminders = new Collection();
 
-		/** @type {import("discord.js").User?} */
+		/**
+		 * This is assigned in the `ready` event listener defined in `events/ready.js`.
+		 * @type {import("discord.js").User?}
+		 */
 		this.owner = null;
 
-		this.loadCommands()
-			.then(this.registerEventListeners.bind(this))
-			.then(() => this.login(secrets.discord));
+		Promise.all([this.loadCommands(), this.registerEventListeners()])
+			.then(() => import("./secrets.json", { with: { type: "json" } }))
+			.then(secrets => this.login(secrets.default.discord));
 	}
 
 	async loadCommands() {
@@ -60,7 +63,7 @@ export default class Trustybot extends Client {
 	 */
 	async handleError(err) {
 		console.error(err);
-		return this.owner?.send(`\`\`\`js\n${err.stack}\`\`\``).catch(() => {});
+		return this.owner?.send(`\`\`\`js\n${err.stack}\`\`\``).catch(doNothing);
 	}
 
 	async handleExit() {
