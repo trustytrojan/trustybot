@@ -1,4 +1,5 @@
 import { TextChannel } from "discord.js";
+import { readdirSync } from "fs";
 
 /**
  * Meant for use in `extractIdFromMention`
@@ -70,3 +71,13 @@ export const msToHighestLevelTime = (ms) => {
 	const years = days / 365;
 	return `${years} years`;
 };
+
+/**
+ * For each `.js` module in `dir`, call `callback` with the module's filename and name.
+ * @param {string} dir Directory containing modules
+ * @param {(file: string, name: string) => *} callback Callback taking in the filename and module name (filename minus the .js extension)
+ */
+export const forEachModuleIn = (dir, callback) =>
+	readdirSync(dir)
+		.filter(v => v.endsWith(".js"))
+		.forEach(file => callback(file, file.substring(0, file.length - 3)));

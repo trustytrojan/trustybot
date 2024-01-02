@@ -3,7 +3,7 @@ import { readdirSync } from "fs";
 import TGuild from "./TGuild.js";
 import assert from "assert";
 import "./prototypes.js";
-import { doNothing } from "./util.js";
+import { doNothing, forEachModuleIn } from "./util.js";
 
 export default class Trustybot extends Client {
 	constructor() {
@@ -31,22 +31,20 @@ export default class Trustybot extends Client {
 		/** @type {{ [_: string]: CommandModule }} */
 		this.commands = {};
 
-		for (const file of readdirSync("commands").filter(v => v.endsWith(".js"))) {
-			const name = file.substring(0, file.length - 3);
+		forEachModuleIn("commands", async (file, name) => {
 			const { data, callback } = this.commands[name] = await import(`./commands/${file}`);
 			assert(typeof data === "object");
 			assert(typeof callback === "function");
 			data.name = name;
-		}
+		});
 	}
 
 	async registerEventListeners() {
-		for (const file of readdirSync("events").filter(v => v.endsWith(".js"))) {
-			const name = file.substring(0, file.length - 3);
+		forEachModuleIn("events", async (file, name) => {
 			const callback = (await import(`./events/${file}`)).default;
 			assert(typeof callback === "function");
 			this.on(name, callback);
-		}
+		});
 
 		process.on("uncaughtException", (err) => this.handleError(err).then(this.handleExit.bind(this)));
 		this.on("error", this.boundHandleError);

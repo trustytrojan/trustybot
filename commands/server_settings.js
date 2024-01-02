@@ -1,6 +1,13 @@
 import { ApplicationCommandOptionType, EmbedBuilder, resolveColor } from "discord.js";
 import TGuild from "../TGuild.js";
 
+const humanReadableSettingNames = {
+	embed_color: "Embed color",
+	log_channel: "Logging channel",
+	bump_channel: "Bump reminder channel",
+	counting_channel: "Counting channel"
+};
+
 /** @param {TbChatInputCommandInteraction} interaction */
 export const callback = async (interaction) => {
 	// don't deal with uncached guilds
@@ -44,7 +51,10 @@ export const callback = async (interaction) => {
 		embed.setTitle("Changing server settings");
 
 		for (const { name, value } of options.data) {
-			embed.addFields({ name, value: await tg[name](value, interaction, embed) });
+			embed.addFields({
+				name: humanReadableSettingNames[name],
+				value: await tg[name](value, interaction, embed)
+			});
 		}
 	}
 
