@@ -32,6 +32,8 @@ export default async (message) => {
 
 			// Reset this server's timer
 			client.bumpReminders.set(guildId, setTimeout(() => channel.send1))
+
+			// UNFINISHED
 		}
 	}
 };

@@ -40,13 +40,6 @@ export default class TGuild {
 			throw err;
 		}
 
-		/* imperative:
-		const entries = Object.entries(tguilds);
-		for (let i = 0; i < entries.length; ++i)
-			entries[i][1] = new TGuild(entries[i][1]);
-		return new Collection(entries); */
-
-		// functional:
 		return new Collection(Object.entries(tguilds).map(([k, v]) => [k, new TGuild(v)]));
 	}
 
@@ -71,7 +64,7 @@ export default class TGuild {
 		};
 
 		Object.defineProperty(this.counting, "channelString", {
-			get: () => this.channel ? `<#${this.channel}>` : "(not set)",
+			get: (() => this.channel ? `<#${this.channel}>` : "(not set)").bind(this.counting),
 		});
 	}
 
