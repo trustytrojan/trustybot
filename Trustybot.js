@@ -1,5 +1,4 @@
 import { Client, Collection } from "discord.js";
-import { readdirSync } from "fs";
 import TGuild from "./TGuild.js";
 import assert from "assert";
 import "./prototypes.js";
