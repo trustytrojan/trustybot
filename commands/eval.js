@@ -3,7 +3,8 @@ import { inspect } from "util";
 
 /** @param {TbChatInputCommandInteraction} interaction */
 export async function callback(interaction) {
-	const { options, user, client } = interaction;
+	// guild and channel are destructured for eval usage
+	const { options, user, client, guild, channel } = interaction;
 	if (user.id !== client.owner?.id) return;
 	const code = options.getString("code", true);
 	const output = inspect(await eval(code), true, options.getInteger("depth") ?? 0);
