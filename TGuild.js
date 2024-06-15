@@ -59,7 +59,7 @@ export default class TGuild {
 		this.bumpChannel = o.bumpChannel ?? null;
 		this.counting = o.counting ?? {
 			channel: null,
-			count: 0,
+			count: 1,
 			lastUser: null
 		};
 
@@ -76,27 +76,27 @@ export default class TGuild {
 		return this.bumpChannel ? `<#${this.bumpChannel}>` : "(not set)";
 	}
 
-	/* The following methods are designed to be called by the code of the `/server_settings` command. */
+	/* The following methods are designed to be called by the `/server_settings` command. */
 
 	/** @type {ServerSettingsOptionCheck} */
-	embed_color(value, _, embed) {
+	set_embed_color(value, _, embed) {
 		try { embed.setColor(value) }
 		catch { return `**error:** \`${value}\` is not a hex color code` }
 		return `\`${this.embedColor}\` ➡️ \`${this.embedColor = value}\``;
 	}
 
 	/** @type {ServerSettingsOptionCheck} */
-	log_channel(value, { guild }) {
+	set_log_channel(value, { guild }) {
 		return this.#ssTextChannel("log", value, guild, "server logs will be sent here!");
 	}
 
 	/** @type {ServerSettingsOptionCheck} */
-	bump_channel(value, { guild }) {
+	set_bump_channel(value, { guild }) {
 		return this.#ssTextChannel("bump", value, guild, "bump reminders will be sent here!");
 	}
 
 	/** @type {ServerSettingsOptionCheck} */
-	async counting_channel(value, { guild }) {
+	async set_counting_channel(value, { guild }) {
 		if (value === "clear") {
 			const str = this.counting.channelString;
 			this.counting = defaultTgCounting();

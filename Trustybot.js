@@ -10,6 +10,7 @@ export default class Trustybot extends Client {
 
 		this.tguilds = TGuild.loadTGuilds();
 
+		/** @type {Collection<string, NodeJS.Timeout>} */
 		this.bumpReminders = new Collection();
 
 		/**
@@ -17,9 +18,6 @@ export default class Trustybot extends Client {
 		 * @type {import("discord.js").User?}
 		 */
 		this.owner = null;
-
-		/** @type {(err: Error) => Promise<void>} */
-		this.boundHandleError = this.handleError.bind(this);
 
 		Promise.all([this.loadCommands(), this.registerEventListeners()])
 			.then(() => import("./secrets.json", { with: { type: "json" } }))
@@ -46,12 +44,8 @@ export default class Trustybot extends Client {
 		});
 
 		process.on("uncaughtException", (err) => this.handleError(err).then(this.handleExit.bind(this)));
-		this.on("error", this.boundHandleError);
+		this.on("error", this.handleError.bind(this));
 
-		/**
-		 * @param {this | NodeJS.Process} x 
-		 * @param {keyof import("discord.js").ClientEvents | NodeJS.Signals} v 
-		 */
 		const handleExitEvent = (x, v) => x.on(v, () => { console.log(v); this.handleExit(); });
 		handleExitEvent(this, "invalidated");
 		handleExitEvent(process, "SIGINT");

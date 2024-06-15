@@ -15,10 +15,8 @@ export default (client) => {
 
 	const commandData = Object.values(client.commands).map(command => command.data);
 
-	// client.application.commands.set([]).then(() => console.log("Set global commands"));
-
-	// client.guilds.fetch("1184967287439106098").then(async guild => {
-	// 	await guild.commands.set(commandData);
-	// 	console.log(`Set commands for guild "${guild.name}"`);
-	// });
+	client.guilds.cache.forEach(async guild => {
+		await guild.commands.set(commandData);
+		console.log(`Set commands for guild "${guild.name}"`);
+	});
 };

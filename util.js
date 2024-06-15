@@ -1,9 +1,6 @@
 import { TextChannel } from "discord.js";
 import { readdirSync } from "fs";
 
-/**
- * Meant for use in `extractIdFromMention`
- */
 const mentionPatterns = {
 	channel: /<#|>/g,
 	userOrRole: /<@&?!?|>/g,

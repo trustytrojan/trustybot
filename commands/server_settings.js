@@ -15,12 +15,12 @@ export const callback = async (interaction) => {
 
 	const { client, options, guild, guildId, member } = interaction;
 	const tg = client.tguilds.ensure(guildId, () => new TGuild());
-	
+
 	const embed = new EmbedBuilder({
 		color: resolveColor(tg.embedColor),
 		author: { iconURL: guild.iconURL() }
 	});
-	
+
 	if (options.data.length === 0) {
 		embed.setTitle("Server settings");
 		const makeFieldValue = (val, desc, wrap) => `**Value:** ${wrap ? `\`${val}\`` : val}\n*${desc}*`;
@@ -53,13 +53,13 @@ export const callback = async (interaction) => {
 		for (const { name, value } of options.data) {
 			embed.addFields({
 				name: humanReadableSettingNames[name],
-				value: await tg[name](value, interaction, embed)
+				value: await tg[`set_${name}`](value, interaction, embed)
 			});
 		}
 	}
 
 	interaction.reply({ embeds: [embed] });
-}
+};
 
 /** @type {import("discord.js").APIApplicationCommand} */
 export const data = {

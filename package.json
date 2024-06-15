@@ -2,5 +2,9 @@
 	"dependencies": {
 		"discord.js": "^14.14.1"
 	},
-	"type": "module"
+	"type": "module",
+	"scripts": {
+		"start": "node . 2>&1 >log & echo $! >pid",
+		"stop": "kill $(<pid)"
+	}
 }

@@ -5,10 +5,23 @@ import { inspect } from "util";
 export async function callback(interaction) {
 	// guild and channel are destructured for eval usage
 	const { options, user, client, guild, channel } = interaction;
-	if (user.id !== client.owner?.id) return;
+
+	if (user.id !== client.owner?.id)
+		return;
+
 	const code = options.getString("code", true);
-	const output = inspect(await eval(code), true, options.getInteger("depth") ?? 0);
+
+	let returnValue;
+	try { returnValue = await eval(code); }
+	catch (err) {
+		client.handleError(err);
+		interaction.reply(`\`\`\`js\n${err}\`\`\``);
+		return;
+	}
+
+	const output = inspect(returnValue, options.getBoolean('show_hidden'), options.getInteger("depth") ?? 0);
 	const outputFormatted = `\`\`\`js\n${output}\`\`\``;
+
 	if (outputFormatted.length <= 2000)
 		interaction.reply(outputFormatted);
 	else if (outputFormatted.length > 2000 && outputFormatted.length <= 4096)
@@ -23,14 +36,19 @@ export const data = {
 	options: [
 		{
 			type: ApplicationCommandOptionType.String,
-			name: "code",
-			description: "code to eval",
+			name: 'code',
+			description: 'code to eval',
 			required: true
 		},
 		{
+			type: ApplicationCommandOptionType.Boolean,
+			name: 'show_hidden',
+			description: 'whether to show hidden object properties'
+		},
+		{
 			type: ApplicationCommandOptionType.Integer,
-			name: "depth",
-			description: "recursion depth for output"
+			name: 'depth',
+			description: 'object recursion depth'
 		}
 	]
 };
