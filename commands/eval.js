@@ -1,12 +1,14 @@
-import { ApplicationCommandOptionType } from "discord.js";
-import { inspect } from "util";
+import { ApplicationCommandOptionType } from 'discord.js';
+import { inspect } from 'util';
+import TGuild from '../classes/TGuild.js';
 
 /** @param {TbChatInputCommandInteraction} interaction */
 export async function callback(interaction) {
-	// guild and channel are destructured for eval usage
-	const { options, user, client, guild, channel } = interaction;
+	const { options, user, client: tb, guild, guildId, channel, channelId } = interaction;
 
-	if (user.id !== client.owner?.id)
+	const tg = tb.tguilds.ensure(guildId, () => new TGuild);
+
+	if (user.id !== tb.owner?.id)
 		return;
 
 	const code = options.getString("code", true);
@@ -14,7 +16,7 @@ export async function callback(interaction) {
 	let returnValue;
 	try { returnValue = await eval(code); }
 	catch (err) {
-		client.handleError(err);
+		tb.handleError(err);
 		interaction.reply(`\`\`\`js\n${err}\`\`\``);
 		return;
 	}

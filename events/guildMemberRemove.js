@@ -1,10 +1,10 @@
 import { TextChannel } from "discord.js";
-import { doNothing, msToHighestLevelTime } from "../util.js";
+import { doNothing, msToHighestLevelTime } from "../misc/util.js";
 import assert from "assert";
 
-/** @param {import("discord.js").GuildMember & { client: import("../Trustybot.js").default }} */
-export default async ({ client, guild, user, joinedTimestamp }) => {
-	const tg = client.tguilds.get(guild.id);
+/** @param {import("discord.js").GuildMember & { client: import("../classes/Trustybot.js").default }} */
+export default async ({ client: tb, guild, user, joinedTimestamp }) => {
+	const tg = tb.tguilds.get(guild.id);
 	if (!tg?.logChannel) return;
 	const channel = await guild.channels.fetch(tg.logChannel);
 	// assertion is necessary as only text channels can be the logChannel
@@ -17,5 +17,5 @@ export default async ({ client, guild, user, joinedTimestamp }) => {
 			{ name: "Mention", value: user.toString(), inline: true },
 			{ name: "Membership duration", value: msToHighestLevelTime(Date.now() - joinedTimestamp) }
 		]
-	}] }).catch(client.boundHandleError);
+	}] }).catch(tb.boundHandleError);
 };

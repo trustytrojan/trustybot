@@ -1,6 +1,6 @@
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { Collection } from "discord.js";
-import { ssGetTextChannelFromMention } from "./util.js";
+import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { Collection } from 'discord.js';
+import { ssGetTextChannelFromMention } from '../misc/util.js';
 
 /**
  * @typedef {object} TgCounting
@@ -21,7 +21,7 @@ import { ssGetTextChannelFromMention } from "./util.js";
 const defaultTgCounting = () => ({ channel: null, count: 1, lastUser: null });
 
 export default class TGuild {
-	static PATH = "tguilds.json";
+	static PATH = 'tguilds.json';
 
 	/**
 	 * @returns {Collection<string, TGuild>}
@@ -33,7 +33,7 @@ export default class TGuild {
 
 		/** @type {{ [_: string]: TGuildData }} */
 		let tguilds;
-		try { tguilds = JSON.parse(readFileSync(this.PATH, "utf8")) }
+		try { tguilds = JSON.parse(readFileSync(this.PATH).toString()) }
 		catch (err) {
 			if (err instanceof SyntaxError)
 				return new Collection;
@@ -78,24 +78,24 @@ export default class TGuild {
 
 	/* The following methods are designed to be called by the `/server_settings` command. */
 
-	/** @type {ServerSettingsOptionCheck} */
+	/** @type {ServerSettingsSetter} */
 	set_embed_color(value, _, embed) {
 		try { embed.setColor(value) }
 		catch { return `**error:** \`${value}\` is not a hex color code` }
 		return `\`${this.embedColor}\` ➡️ \`${this.embedColor = value}\``;
 	}
 
-	/** @type {ServerSettingsOptionCheck} */
+	/** @type {ServerSettingsSetter} */
 	set_log_channel(value, { guild }) {
 		return this.#ssTextChannel("log", value, guild, "server logs will be sent here!");
 	}
 
-	/** @type {ServerSettingsOptionCheck} */
+	/** @type {ServerSettingsSetter} */
 	set_bump_channel(value, { guild }) {
 		return this.#ssTextChannel("bump", value, guild, "bump reminders will be sent here!");
 	}
 
-	/** @type {ServerSettingsOptionCheck} */
+	/** @type {ServerSettingsSetter} */
 	async set_counting_channel(value, { guild }) {
 		if (value === "clear") {
 			const str = this.counting.channelString;

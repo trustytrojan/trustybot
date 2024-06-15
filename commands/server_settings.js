@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, EmbedBuilder, resolveColor } from "discord.js";
-import TGuild from "../TGuild.js";
+import TGuild from "../classes/TGuild.js";
 
 const humanReadableSettingNames = {
 	embed_color: "Embed color",
@@ -13,8 +13,8 @@ export const callback = async (interaction) => {
 	// don't deal with uncached guilds
 	if (!interaction.inCachedGuild()) return;
 
-	const { client, options, guild, guildId, member } = interaction;
-	const tg = client.tguilds.ensure(guildId, () => new TGuild());
+	const { client: tb, options, guild, guildId, member } = interaction;
+	const tg = tb.tguilds.ensure(guildId, () => new TGuild);
 
 	const embed = new EmbedBuilder({
 		color: resolveColor(tg.embedColor),

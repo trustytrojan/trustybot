@@ -1,10 +1,10 @@
 import { TextChannel } from "discord.js";
-import { msToDiscordTimestamp } from "../util.js";
+import { msToDiscordTimestamp } from "../misc/util.js";
 import assert from "assert";
 
-/** @param {import("discord.js").GuildMember & { client: import("../Trustybot.js").default }} */
-export default async ({ client, guild, user }) => {
-	const tg = client.tguilds.get(guild.id);
+/** @param {import("discord.js").GuildMember & { client: import("../classes/Trustybot.js").default }} */
+export default async ({ client: tb, guild, user }) => {
+	const tg = tb.tguilds.get(guild.id);
 	if (!tg?.logChannel) return;
 	const channel = await guild.channels.fetch(tg.logChannel);
 	assert(channel instanceof TextChannel);
@@ -16,5 +16,5 @@ export default async ({ client, guild, user }) => {
 			{ name: "Mention", value: user.toString(), inline: true },
 			{ name: "Account created", value: msToDiscordTimestamp(user.createdTimestamp, "R") }
 		]
-	}] }).catch(client.boundHandleError);
+	}] }).catch(tb.boundHandleError);
 };

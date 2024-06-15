@@ -1,8 +1,8 @@
 import { Client, Collection } from "discord.js";
 import TGuild from "./TGuild.js";
 import assert from "assert";
-import "./prototypes.js";
-import { doNothing, forEachModuleIn } from "./util.js";
+import "../misc/prototypes.js";
+import { doNothing, forEachModuleIn } from "../misc/util.js";
 
 export default class Trustybot extends Client {
 	constructor() {
@@ -14,13 +14,16 @@ export default class Trustybot extends Client {
 		this.bumpReminders = new Collection();
 
 		/**
-		 * This is assigned in the `ready` event listener defined in `events/ready.js`.
+		 * This is assigned in [`events/ready.js`](../events/ready.js).
 		 * @type {import("discord.js").User?}
 		 */
 		this.owner = null;
 
+		/** @type {typeof this.handleError} */
+		this.boundHandleError = this.handleError.bind(this);
+
 		Promise.all([this.loadCommands(), this.registerEventListeners()])
-			.then(() => import("./secrets.json", { with: { type: "json" } }))
+			.then(() => import("../secrets.json", { with: { type: "json" } }))
 			.then(secrets => this.login(secrets.default.discord));
 	}
 
@@ -29,7 +32,7 @@ export default class Trustybot extends Client {
 		this.commands = {};
 
 		forEachModuleIn("commands", async (file, name) => {
-			const { data, callback } = this.commands[name] = await import(`./commands/${file}`);
+			const { data, callback } = this.commands[name] = await import(`../commands/${file}`);
 			assert(typeof data === "object");
 			assert(typeof callback === "function");
 			data.name = name;
@@ -38,13 +41,13 @@ export default class Trustybot extends Client {
 
 	async registerEventListeners() {
 		forEachModuleIn("events", async (file, name) => {
-			const callback = (await import(`./events/${file}`)).default;
+			const callback = (await import(`../events/${file}`)).default;
 			assert(typeof callback === "function");
 			this.on(name, callback);
 		});
 
 		process.on("uncaughtException", (err) => this.handleError(err).then(this.handleExit.bind(this)));
-		this.on("error", this.handleError.bind(this));
+		this.on("error", this.boundHandleError);
 
 		const handleExitEvent = (x, v) => x.on(v, () => { console.log(v); this.handleExit(); });
 		handleExitEvent(this, "invalidated");

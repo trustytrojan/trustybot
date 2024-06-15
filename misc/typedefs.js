@@ -1,5 +1,5 @@
 /**
- * @typedef {import("discord.js").ChatInputCommandInteraction<"cached"> & { client: import("./Trustybot.js").default }} TbChatInputCommandInteraction
+ * @typedef {import("discord.js").ChatInputCommandInteraction<"cached"> & { client: import("../classes/Trustybot.js").default }} TbChatInputCommandInteraction
  */
 
 /**
@@ -9,9 +9,9 @@
  */
 
 /**
- * @callback ServerSettingsOptionCheck
+ * @callback ServerSettingsSetter
  * @param {string} value 
- * @param {TbChatInputCommandInteraction} 
+ * @param {TbChatInputCommandInteraction} interaction
  * @param {import("discord.js").EmbedBuilder} embed
  * @returns {string}
  */
