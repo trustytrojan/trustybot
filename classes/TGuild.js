@@ -2,22 +2,6 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { Collection } from 'discord.js';
 import { ssGetTextChannelFromMention } from '../misc/util.js';
 
-/**
- * @typedef {object} TgCounting
- * @prop {string?} channel
- * @prop {readonly string} channelString
- * @prop {number} count
- * @prop {string?} lastUser
- */
-
-/**
- * @typedef {object} TGuildData
- * @prop {string} embedColor
- * @prop {string?} logChannel
- * @prop {string?} bumpChannel
- * @prop {TgCounting} counting
- */
-
 const defaultTgCounting = () => ({ channel: null, count: 1, lastUser: null });
 
 export default class TGuild {
@@ -57,11 +41,7 @@ export default class TGuild {
 		this.embedColor = o.embedColor ?? "ff00ff";
 		this.logChannel = o.logChannel ?? null;
 		this.bumpChannel = o.bumpChannel ?? null;
-		this.counting = o.counting ?? {
-			channel: null,
-			count: 1,
-			lastUser: null
-		};
+		this.counting = o.counting ?? defaultTgCounting();
 
 		Object.defineProperty(this.counting, "channelString", {
 			get: (() => this.channel ? `<#${this.channel}>` : "(not set)").bind(this.counting),

@@ -2,4 +2,5 @@ package-lock.json
 node_modules
 tguilds.json
 secrets.json
-token
+log
+pid
