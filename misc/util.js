@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { AuditLogEvent, TextChannel } from "discord.js";
 import { readdirSync } from "fs";
 
 const mentionPatterns = {
@@ -47,34 +47,54 @@ export const doNothing = () => {};
  * @param {number} ms Unix time in milliseconds
  */
 export const msToHighestLevelTime = (ms) => {
-	const seconds = ms / 1000;
+	const seconds = Math.round(ms / 1000);
 	if (seconds < 60) return `${seconds} seconds`;
 
-	const minutes = seconds / 60;
+	const minutes = Math.round(seconds / 60);
 	if (minutes < 60) return `${minutes} minutes`;
 
-	const hours = minutes / 60;
+	const hours = Math.round(minutes / 60);
 	if (hours < 24) return `${hours} hours`;
 
-	const days = hours / 24;
+	const days = Math.round(hours / 24);
 	if (days < 7) return `${days} days`;
 
-	const weeks = days / 7;
+	const weeks = Math.round(days / 7);
 	if (weeks < 4) return `${weeks} weeks`;
 
-	const months = days / 30;
+	const months = Math.round(days / 30);
 	if (months < 12) return `${months} months`;
 
-	const years = days / 365;
+	const years = Math.round(days / 365);
 	return `${years} years`;
 };
 
 /**
  * For each `.js` module in `dir`, call `callback` with the module's filename and name.
  * @param {string} dir Directory containing modules
- * @param {(file: string, name: string) => *} callback Callback taking in the filename and module name (filename minus the .js extension)
+ * @param {(file: string, name: string) => *} callback Callback taking in the filename and module name (filename minus the `.js` extension)
  */
 export const forEachModuleIn = (dir, callback) =>
 	readdirSync(dir)
 		.filter(v => v.endsWith(".js"))
 		.forEach(file => callback(file, file.substring(0, file.length - 3)));
+
+/**
+ * Return the audit log entry of `type` in `guild` created within the last 5 seconds.
+ * Returns `undefined` if no such entry is found.
+ * @param {import('discord.js').Guild} guild 
+ * @param {keyof typeof import('discord.js').AuditLogEvent} type 
+ */
+export const getLatestAuditLogEntry = async (guild, type) => {
+	const entry = (await guild.fetchAuditLogs({ type: AuditLogEvent[type], limit: 1 })).entries.first();
+	if (Date.now() - entry.createdTimestamp > 5_000)
+		return;
+	return entry;
+}
+
+/**
+ * @param {import('discord.js').User} executor 
+ * @returns {import('discord.js').APIEmbedAuthor}
+ */
+export const makeExecutorEmbedAuthor = (executor) =>
+	({ name: `Executor: ${executor.username}`, icon_url: executor.displayAvatarURL() });

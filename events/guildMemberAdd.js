@@ -1,6 +1,6 @@
-import { TextChannel } from "discord.js";
-import { msToDiscordTimestamp } from "../misc/util.js";
-import assert from "assert";
+import { TextChannel } from 'discord.js';
+import { msToDiscordTimestamp } from '../misc/util.js';
+import assert from 'assert';
 
 /** @param {import("discord.js").GuildMember & { client: import("../classes/Trustybot.js").default }} */
 export default async ({ client: tb, guild, user }) => {
@@ -8,13 +8,14 @@ export default async ({ client: tb, guild, user }) => {
 	if (!tg?.logChannel) return;
 	const channel = await guild.channels.fetch(tg.logChannel);
 	assert(channel instanceof TextChannel);
-	channel.send({ embeds: [{
-		title: "User joined",
-		thumbnail: { url: user.displayAvatarURL() },
-		fields: [
-			{ name: "Username", value: user.tag, inline: true },
-			{ name: "Mention", value: user.toString(), inline: true },
-			{ name: "Account created", value: msToDiscordTimestamp(user.createdTimestamp, "R") }
-		]
-	}] }).catch(tb.boundHandleError);
+	channel.send({
+		embeds: [{
+			title: 'User joined',
+			thumbnail: { url: user.displayAvatarURL() },
+			description: user.toString(),
+			fields: [
+				{ name: 'Account created', value: msToDiscordTimestamp(user.createdTimestamp, 'R') }
+			]
+		}]
+	}).catch(tb.boundHandleError);
 };

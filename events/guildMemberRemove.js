@@ -1,21 +1,43 @@
-import { TextChannel } from "discord.js";
-import { doNothing, msToHighestLevelTime } from "../misc/util.js";
-import assert from "assert";
+import { TextChannel, AuditLogEvent } from 'discord.js';
+import { makeExecutorEmbedAuthor, msToHighestLevelTime } from '../misc/util.js';
+import assert from 'assert';
 
 /** @param {import("discord.js").GuildMember & { client: import("../classes/Trustybot.js").default }} */
 export default async ({ client: tb, guild, user, joinedTimestamp }) => {
 	const tg = tb.tguilds.get(guild.id);
-	if (!tg?.logChannel) return;
+	if (!tg?.logChannel)
+		return;
+
 	const channel = await guild.channels.fetch(tg.logChannel);
-	// assertion is necessary as only text channels can be the logChannel
 	assert(channel instanceof TextChannel);
-	channel.send({ embeds: [{
-		title: "Member left",
-		thumbnail: { url: user.displayAvatarURL() },
-		fields: [
-			{ name: "Username", value: user.tag, inline: true },
-			{ name: "Mention", value: user.toString(), inline: true },
-			{ name: "Membership duration", value: msToHighestLevelTime(Date.now() - joinedTimestamp) }
-		]
-	}] }).catch(tb.boundHandleError);
+
+	/** @type {import('discord.js').GuildAuditLogsEntry | undefined} */
+	let entry;
+
+	/** @type {'kicked' | 'banned' | undefined} */
+	let kb;
+
+	await guild.fetchAuditLogs({ limit: 1 }).then(({ entries }) => {
+		entry = entries.first();
+		if (!entry?.targetId === user.id || ![AuditLogEvent.MemberKick, AuditLogEvent.MemberBanAdd].includes(entry.action))
+			return;
+		if (entry.action === AuditLogEvent.MemberKick) {
+			kb = 'kicked';
+		} else if (entry.action === AuditLogEvent.MemberBanAdd && entry.targetId === user.id) {
+			kb = 'banned';
+		}
+	}).catch(tb.boundHandleError);
+
+	channel.send({
+		embeds: [{
+			author: entry ? makeExecutorEmbedAuthor(entry.executor) : null,
+			title: `Member ${kb ?? 'left'}`,
+			thumbnail: { url: user.displayAvatarURL() },
+			description: user.toString(),
+			fields: [
+				...(entry?.reason?.length ? [{ name: `Reason`, value: entry.reason }] : []),
+				{ name: 'Membership duration', value: msToHighestLevelTime(Date.now() - joinedTimestamp) }
+			]
+		}]
+	}).catch(tb.boundHandleError);
 };

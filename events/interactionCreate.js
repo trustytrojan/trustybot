@@ -1,16 +1,16 @@
 /**
- * @param {import("discord.js").BaseInteraction & { client: import("../Trustybot").default }} interaction
+ * @param {import('discord.js').BaseInteraction & { client: import('../classes/Trustybot').default }} interaction
  */
-export default (interaction) => {
-	const { client } = interaction;
+export default async (interaction) => {
+	const { client: tb } = interaction;
 	try {
 		if (interaction.isChatInputCommand())
-			client.commands[interaction.commandName].callback(interaction);
+			await tb.commands[interaction.commandName].callback(interaction);
 		if (interaction.isChannelSelectMenu())
-			client.emit("channelSelectMenu", interaction);
+			tb.emit("channelSelectMenu", interaction);
 	} catch (err) {
 		if (interaction.isRepliable())
 			interaction.reply(`**this is an error**\`\`\`js\n${err.stack}\`\`\``);
-		client.handleError(err);
+		tb.handleError(err);
 	}
 };

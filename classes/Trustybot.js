@@ -6,7 +6,15 @@ import { doNothing, forEachModuleIn } from "../misc/util.js";
 
 export default class Trustybot extends Client {
 	constructor() {
-		super({ intents: ["Guilds", "GuildMembers", "GuildMessages", "MessageContent"] });
+		super({
+			intents: [
+				'Guilds',
+				'GuildMembers',
+				'GuildMessages',
+				'GuildModeration',
+				'MessageContent'
+			]
+		});
 
 		this.tguilds = TGuild.loadTGuilds();
 
