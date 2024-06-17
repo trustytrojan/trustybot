@@ -1,1 +1,1 @@
-new (await import("./classes/Trustybot.js")).default;
+new (await import('./classes/Trustybot.js')).default;

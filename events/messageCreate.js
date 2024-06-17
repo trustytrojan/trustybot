@@ -2,7 +2,7 @@
 const countingState = {};
 
 /**
- * @param {import("discord.js").Message & { client: import("../classes/Trustybot").default }} message
+ * @param {import('discord.js').Message & TbOwned} message
  */
 export default async (message) => {
 	const { client: tb, channelId, channel, content, author } = message;
@@ -38,7 +38,7 @@ export default async (message) => {
 
 			if (isNaN(number))
 				return;
-			
+
 			const awaitRateLimit = async () => {
 				countingState[guildId].waiting = true;
 				await countingState[guildId].rateLimit;
@@ -49,7 +49,7 @@ export default async (message) => {
 				tg.counting.lastUser = author.id;
 				++tg.counting.count;
 				await awaitRateLimit();
-				message.react("✅");
+				message.react('✅');
 			} else {
 				tg.counting.lastUser = null;
 				tg.counting.count = 1;

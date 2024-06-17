@@ -1,8 +1,8 @@
-import { Client, Collection } from "discord.js";
-import TGuild from "./TGuild.js";
-import assert from "assert";
-import "../misc/prototypes.js";
-import { doNothing, forEachModuleIn } from "../misc/util.js";
+import { Client, Collection } from 'discord.js';
+import TGuild from './TGuild.js';
+import assert from 'assert';
+import '../misc/prototypes.js';
+import { doNothing, forEachModuleIn } from '../misc/util.js';
 
 export default class Trustybot extends Client {
 	constructor() {
@@ -31,7 +31,7 @@ export default class Trustybot extends Client {
 		this.boundHandleError = this.handleError.bind(this);
 
 		Promise.all([this.loadCommands(), this.registerEventListeners()])
-			.then(() => import("../secrets.json", { with: { type: "json" } }))
+			.then(() => import('../secrets.json', { with: { type: 'json' } }))
 			.then(secrets => this.login(secrets.default.discord));
 	}
 
@@ -39,28 +39,28 @@ export default class Trustybot extends Client {
 		/** @type {{ [_: string]: CommandModule }} */
 		this.commands = {};
 
-		forEachModuleIn("commands", async (file, name) => {
+		forEachModuleIn('commands', async (file, name) => {
 			const { data, callback } = this.commands[name] = await import(`../commands/${file}`);
-			assert(typeof data === "object");
-			assert(typeof callback === "function");
+			assert(typeof data === 'object');
+			assert(typeof callback === 'function');
 			data.name = name;
 		});
 	}
 
 	async registerEventListeners() {
-		forEachModuleIn("events", async (file, name) => {
+		forEachModuleIn('events', async (file, name) => {
 			const callback = (await import(`../events/${file}`)).default;
-			assert(typeof callback === "function");
+			assert(typeof callback === 'function');
 			this.on(name, callback);
 		});
 
-		process.on("uncaughtException", (err) => this.handleError(err).then(this.handleExit.bind(this)));
-		this.on("error", this.boundHandleError);
+		process.on('uncaughtException', (err) => this.handleError(err).then(this.handleExit.bind(this)));
+		this.on('error', this.boundHandleError);
 
 		const handleExitEvent = (x, v) => x.on(v, () => { console.log(v); this.handleExit(); });
-		handleExitEvent(this, "invalidated");
-		handleExitEvent(process, "SIGINT");
-		handleExitEvent(process, "SIGTERM");
+		handleExitEvent(this, 'invalidated');
+		handleExitEvent(process, 'SIGINT');
+		handleExitEvent(process, 'SIGTERM');
 	}
 
 	/**
@@ -73,9 +73,9 @@ export default class Trustybot extends Client {
 
 	async handleExit() {
 		await this.destroy();
-		console.log("Destroyed client");
+		console.log('Destroyed client');
 		TGuild.saveTGuilds(this.tguilds);
-		console.log("Saved TGuilds");
+		console.log('Saved TGuilds');
 		process.exit();
 	}
 }

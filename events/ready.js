@@ -1,5 +1,5 @@
-import assert from "assert";
-import { User } from "discord.js";
+import assert from 'assert';
+import { User } from 'discord.js';
 
 /**
  * @param {import("discord.js").Client<true> & import("../classes/Trustybot.js").default} tb 
@@ -10,7 +10,7 @@ export default (tb) => {
 	tb.application.fetch().then(({ owner }) => {
 		assert(owner instanceof User);
 		tb.owner = owner;
-		console.log("Fetched owner");
+		console.log('Fetched owner');
 	});
 
 	// const commandData = Object.values(tb.commands).map(command => command.data);

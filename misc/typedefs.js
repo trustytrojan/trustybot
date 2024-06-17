@@ -2,10 +2,7 @@
 
 /**
  * @typedef {{ client: import('../classes/Trustybot.js').default }} TbOwned
- */
-
-/**
- * @typedef {import("discord.js").ChatInputCommandInteraction<"cached"> & TbOwned} TbChatInputCommandInteraction
+ * @typedef {import('discord.js').ChatInputCommandInteraction & TbOwned} TbChatInputCommandInteraction
  */
 
 /**

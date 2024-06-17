@@ -7,7 +7,7 @@ export default async (interaction) => {
 		if (interaction.isChatInputCommand())
 			await tb.commands[interaction.commandName].callback(interaction);
 		if (interaction.isChannelSelectMenu())
-			tb.emit("channelSelectMenu", interaction);
+			tb.emit('channelSelectMenu', interaction);
 	} catch (err) {
 		if (interaction.isRepliable())
 			interaction.reply(`**this is an error**\`\`\`js\n${err.stack}\`\`\``);
