@@ -1,5 +1,5 @@
 /**
- * @param {import('discord.js').BaseInteraction & { client: import('../classes/Trustybot').default }} interaction
+ * @param {import('discord.js').BaseInteraction & TbOwned} interaction
  */
 export default async (interaction) => {
 	const { client: tb } = interaction;

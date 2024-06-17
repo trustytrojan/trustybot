@@ -1,5 +1,5 @@
-import { AuditLogEvent, TextChannel } from "discord.js";
-import { readdirSync } from "fs";
+import { TextChannel } from 'discord.js';
+import { readdirSync } from 'fs';
 
 const mentionPatterns = {
 	channel: /<#|>/g,
@@ -8,7 +8,7 @@ const mentionPatterns = {
 };
 
 /**
- * @param {"channel" | "userOrRole" | "emoji"} type Mention type
+ * @param {keyof typeof mentionPatterns} type Mention type
  * @param {string} mention Channel, user, role, or emoji mention
  * @returns {string} Resource id
  */
@@ -20,7 +20,7 @@ export const extractIdFromMention = (type, mention) => mention.replaceAll(mentio
  * @returns {Promise<string | import("discord.js").TextChannel>}
  */
 export const ssGetTextChannelFromMention = async (mention, { channels }) => {
-	const channelId = extractIdFromMention("channel", mention);
+	const channelId = extractIdFromMention('channel', mention);
 	let channel;
 	try { channel = await channels.fetch(channelId); }
 	catch { return `**error:** \`${value}\` is not a channel mention`; }
@@ -76,25 +76,12 @@ export const msToHighestLevelTime = (ms) => {
  */
 export const forEachModuleIn = (dir, callback) =>
 	readdirSync(dir)
-		.filter(v => v.endsWith(".js"))
+		.filter(v => v.endsWith('.js'))
 		.forEach(file => callback(file, file.substring(0, file.length - 3)));
-
-/**
- * Return the audit log entry of `type` in `guild` created within the last 5 seconds.
- * Returns `undefined` if no such entry is found.
- * @param {import('discord.js').Guild} guild 
- * @param {keyof typeof import('discord.js').AuditLogEvent} type 
- */
-export const getLatestAuditLogEntry = async (guild, type) => {
-	const entry = (await guild.fetchAuditLogs({ type: AuditLogEvent[type], limit: 1 })).entries.first();
-	if (Date.now() - entry.createdTimestamp > 5_000)
-		return;
-	return entry;
-}
 
 /**
  * @param {import('discord.js').User} executor 
  * @returns {import('discord.js').APIEmbedAuthor}
  */
 export const makeExecutorEmbedAuthor = (executor) =>
-	({ name: `Executor: ${executor.username}`, icon_url: executor.displayAvatarURL() });
+	({ name: executor.username, icon_url: executor.displayAvatarURL() });

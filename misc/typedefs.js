@@ -1,7 +1,11 @@
 // When using VSCode, keep this file pinned open to make typedef hovers work.
 
 /**
- * @typedef {import("discord.js").ChatInputCommandInteraction<"cached"> & { client: import("../classes/Trustybot.js").default }} TbChatInputCommandInteraction
+ * @typedef {{ client: import('../classes/Trustybot.js').default }} TbOwned
+ */
+
+/**
+ * @typedef {import("discord.js").ChatInputCommandInteraction<"cached"> & TbOwned} TbChatInputCommandInteraction
  */
 
 /**
