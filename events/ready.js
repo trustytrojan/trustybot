@@ -13,10 +13,10 @@ export default (tb) => {
 		console.log('Fetched owner');
 	});
 
-	// const commandData = Object.values(tb.commands).map(command => command.data);
+	const commandData = Object.values(tb.commands).map(command => command.data);
 
-	// tb.guilds.cache.forEach(async guild => {
-	// 	await guild.commands.set(commandData);
-	// 	console.log(`Set commands for guild "${guild.name}"`);
-	// });
+	tb.guilds.cache.forEach(async guild => {
+		await guild.commands.set(commandData);
+		console.log(`Set commands for guild "${guild.name}"`);
+	});
 };
