@@ -5,17 +5,17 @@ import {
 	ColorResolvable,
 	EmbedBuilder,
 	resolveColor,
-	TextChannel,
+	TextChannel
 } from 'discord.js';
+import assert from 'node:assert';
 import TGuild from '../classes/TGuild.js';
 import { TbChatInputCommandInteraction } from '../classes/Trustybot.js';
-import assert from 'node:assert';
 
 const humanReadableSettingNames = {
 	embed_color: 'Embed color',
 	log_channel: 'Logging channel',
 	bump_channel: 'Bump reminder channel',
-	counting_channel: 'Counting channel',
+	counting_channel: 'Counting channel'
 };
 
 export const callback = (interaction: TbChatInputCommandInteraction) => {
@@ -26,30 +26,27 @@ export const callback = (interaction: TbChatInputCommandInteraction) => {
 	const tg = tb.tguilds.ensure(guildId, () => new TGuild());
 
 	if (!member.permissions.has('ManageGuild')) {
-		interaction.replyEphemeral(
-			"You don't have the `Manage Server` permission!",
-		);
+		interaction.replyEphemeral("You don't have the `Manage Server` permission!");
 		return;
 	}
 
 	const embed = new EmbedBuilder({
 		color: resolveColor(tg.embedColor as ColorResolvable),
-		author: { name: guild.name, iconURL: guild.iconURL() ?? void 0 },
+		author: { name: guild.name, iconURL: guild.iconURL() ?? void 0 }
 	});
 
 	if (options.data.length === 0) {
 		embed.setTitle('Server settings');
-		const makeFieldValue = (val: string, desc: string, wrap?: boolean) =>
-			`**Value:** ${wrap ? `\`${val}\`` : val}\n*${desc}*`;
+		const makeFieldValue = (val: string, desc: string, wrap?: boolean) => `**Value:** ${wrap ? `\`${val}\`` : val}\n*${desc}*`;
 		embed.addFields(
 			{
 				name: 'Embed color',
-				value: makeFieldValue(tg.embedColor, 'Default color of embeds', true),
+				value: makeFieldValue(tg.embedColor, 'Default color of embeds', true)
 			},
 			{
 				name: 'Log channel',
-				value: makeFieldValue(tg.logChannelString, 'Channel for sending server event logs'),
-			},
+				value: makeFieldValue(tg.logChannelString, 'Channel for sending server event logs')
+			}
 		);
 	} else {
 		if (!member.permissions.has('ManageGuild')) {
@@ -71,7 +68,7 @@ export const callback = (interaction: TbChatInputCommandInteraction) => {
 						} catch {
 							embedValue = `**error:** \`${value}\` is not a hex color code`;
 						}
-						embedValue = `\`${tg.embedColor}\` ➡️ \`${tg.embedColor = value}\``;
+						embedValue = `\`${tg.embedColor}\` ➡️ \`${(tg.embedColor = value)}\``;
 					}
 					break;
 
@@ -83,14 +80,14 @@ export const callback = (interaction: TbChatInputCommandInteraction) => {
 						if (!channel.permissionsFor(guild.members.me).has('SendMessages')) {
 							return `**error:** i cannot send messages in ${value}`;
 						}
-						embedValue = `${tg.logChannelString} ➡️ <#${tg.logChannel = channel.id}>`;
+						embedValue = `${tg.logChannelString} ➡️ <#${(tg.logChannel = channel.id)}>`;
 					}
 					break;
 			}
 
 			embed.addFields({
 				name: humanReadableSettingNames[name as keyof typeof humanReadableSettingNames],
-				value: embedValue,
+				value: embedValue
 			});
 		}
 	}
@@ -106,13 +103,13 @@ export const data: ChatInputApplicationCommandData = {
 		{
 			type: ApplicationCommandOptionType.String,
 			name: 'embed_color',
-			description: 'set the default embed color i use',
+			description: 'set the default embed color i use'
 		},
 		{
 			type: ApplicationCommandOptionType.Channel,
 			channel_types: [ChannelType.GuildText],
 			name: 'log_channel',
-			description: 'set the channel i send server event logs in',
-		},
-	],
+			description: 'set the channel i send server event logs in'
+		}
+	]
 };

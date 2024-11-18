@@ -1,18 +1,15 @@
 {
-    "compilerOptions": {
-        "module": "NodeNext",
-        "moduleResolution": "nodenext", // Changed to node
-        "target": "ESNext",
-        "strictNullChecks": true,
-        "strictFunctionTypes": true,
-        "esModuleInterop": true, // Added for interoperability
-        "resolveJsonModule": true, // Added for JSON module resolution
-        "outDir": "./dist", // Optional: specify output directory
-        "forceConsistentCasingInFileNames": true, // Added for consistent casing
-        "skipLibCheck": true // Added to skip type checking of declaration files
-    },
-    "exclude": [
-        "node_modules",
-        "**/node_modules/*"
-    ]
+	"compilerOptions": {
+		"module": "NodeNext",
+		"moduleResolution": "nodenext",
+		"target": "ESNext",
+		"strictNullChecks": true,
+		"strictFunctionTypes": true,
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"outDir": "./dist",
+		"forceConsistentCasingInFileNames": true,
+		"skipLibCheck": true
+	},
+	"include": ["./src/**/*.ts"],
 }

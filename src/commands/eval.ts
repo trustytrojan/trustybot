@@ -1,9 +1,9 @@
 import { ApplicationCommandOptionType, ChatInputApplicationCommandData } from 'discord.js';
+import assert from 'node:assert';
+import { Buffer } from 'node:buffer';
 import { inspect } from 'node:util';
 import TGuild from '../classes/TGuild.js';
 import { TbChatInputCommandInteraction } from '../classes/Trustybot.js';
-import { Buffer } from 'node:buffer';
-import assert from 'node:assert';
 
 export async function callback(interaction: TbChatInputCommandInteraction) {
 	// i have some "unused" variables below for eval usage during runtime
@@ -19,7 +19,7 @@ export async function callback(interaction: TbChatInputCommandInteraction) {
 
 	const code = options.getString('code', true);
 
-	let returnValue;
+	let returnValue: unknown;
 	try {
 		returnValue = await eval(code);
 	} catch (err) {
@@ -32,12 +32,14 @@ export async function callback(interaction: TbChatInputCommandInteraction) {
 	const output = inspect(returnValue, options.getBoolean('show_hidden') ?? false, options.getInteger('depth') ?? 0);
 	const outputFormatted = `\`\`\`js\n${output}\`\`\``;
 
-	if (outputFormatted.length <= 2000) {
+	if (outputFormatted.length <= 2_000) {
 		interaction.reply(outputFormatted);
-	} else if (outputFormatted.length > 2000 && outputFormatted.length <= 4096) {
+	} else if (outputFormatted.length > 2_000 && outputFormatted.length <= 4_096) {
 		interaction.reply({ embeds: [{ description: outputFormatted }] });
 	} else {
-		interaction.reply({ files: [{ attachment: Buffer.from(output), name: 'output.js' }] });
+		interaction.reply({
+			files: [{ attachment: Buffer.from(output), name: 'output.js' }]
+		});
 	}
 }
 
@@ -49,17 +51,17 @@ export const data: ChatInputApplicationCommandData = {
 			type: ApplicationCommandOptionType.String,
 			name: 'code',
 			description: 'code to eval',
-			required: true,
+			required: true
 		},
 		{
 			type: ApplicationCommandOptionType.Boolean,
 			name: 'show_hidden',
-			description: 'whether to show hidden object properties',
+			description: 'whether to show hidden object properties'
 		},
 		{
 			type: ApplicationCommandOptionType.Integer,
 			name: 'depth',
-			description: 'object recursion depth',
-		},
-	],
+			description: 'object recursion depth'
+		}
+	]
 };

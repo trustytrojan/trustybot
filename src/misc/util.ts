@@ -4,7 +4,7 @@ import { readdirSync } from 'node:fs';
 const mentionPatterns = {
 	channel: /<#|>/g,
 	userOrRole: /<@&?!?|>/g,
-	emoji: /<:.+:|>/g,
+	emoji: /<:.+:|>/g
 };
 
 /**
@@ -12,18 +12,12 @@ const mentionPatterns = {
  * @param mention Channel, user, role, or emoji mention
  * @returns Resource id
  */
-export const extractIdFromMention = (
-	type: keyof typeof mentionPatterns,
-	mention: string,
-): string => mention.replaceAll(mentionPatterns[type], '');
+export const extractIdFromMention = (type: keyof typeof mentionPatterns, mention: string): string => mention.replaceAll(mentionPatterns[type], '');
 
 /**
  * @param ms Unix time in milliseconds
  */
-export const msToDiscordTimestamp = (
-	ms: number,
-	style: TimestampStylesString,
-) => `<t:${Math.round(ms / 1000)}:${style}>`;
+export const msToDiscordTimestamp = (ms: number, style: TimestampStylesString) => `<t:${Math.round(ms / 1_000)}:${style}>`;
 
 /**
  * Self-explanatory, meant for use with `Promise.catch()`
@@ -37,7 +31,7 @@ export const doNothing = () => {};
  * @param ms Unix time in milliseconds
  */
 export const msToHighestLevelTime = (ms: number) => {
-	const seconds = Math.round(ms / 1000);
+	const seconds = Math.round(ms / 1_000);
 	if (seconds < 60) return `${seconds} seconds`;
 
 	const minutes = Math.round(seconds / 60);
@@ -64,16 +58,12 @@ export const msToHighestLevelTime = (ms: number) => {
  * @param dir Directory containing modules
  * @param callback Callback taking in the filepath, filename, and module name (filename minus the `.js` extension)
  */
-export const forEachModuleIn = (
-	dir: string,
-	callback: (path: string, file: string, name: string) => void,
-) => readdirSync(dir)
-	.filter((v) => v.endsWith('.js'))
-	.forEach((file) => callback(`${dir}/${file}`, file, file.substring(0, file.length - 3)));
+export const forEachModuleIn = (dir: string, callback: (path: string, file: string, name: string) => void) =>
+	readdirSync(dir)
+		.filter(v => v.endsWith('.js'))
+		.forEach(file => callback(`${dir}/${file}`, file, file.substring(0, file.length - 3)));
 
-export const makeExecutorEmbedAuthor = (
-	executor: User,
-): APIEmbedAuthor => ({
+export const makeExecutorEmbedAuthor = (executor: User): APIEmbedAuthor => ({
 	name: executor.username,
-	icon_url: executor.displayAvatarURL(),
+	icon_url: executor.displayAvatarURL()
 });

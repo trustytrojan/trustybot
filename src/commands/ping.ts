@@ -7,5 +7,5 @@ export function callback(interaction: TbChatInputCommandInteraction) {
 
 export const data: ChatInputApplicationCommandData = {
 	name: 'ping',
-	description: 'ping',
+	description: 'ping'
 };

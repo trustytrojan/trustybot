@@ -1,19 +1,15 @@
 import { ChatInputApplicationCommandData, ChatInputCommandInteraction, Client, User } from 'discord.js';
-import TGuild from './TGuild.js';
 import assert from 'node:assert';
-import { doNothing, forEachModuleIn } from '../misc/util.js';
-import { TbCommandInteraction } from '../misc/prototypes.js';
 import process from 'node:process';
+import { TbCommandInteraction } from '../misc/prototypes.js';
+import { doNothing, forEachModuleIn } from '../misc/util.js';
+import TGuild from './TGuild.js';
 
 export type TbOwned = { client: Trustybot };
-
-export type TbChatInputCommandInteraction =
-	& ChatInputCommandInteraction<'cached'>
-	& TbOwned
-	& TbCommandInteraction;
+export type TbChatInputCommandInteraction = ChatInputCommandInteraction<'cached'> & TbOwned & TbCommandInteraction;
 
 export interface CommandModule {
-	callback: (_: TbChatInputCommandInteraction) => unknown;
+	callback(interaction: TbChatInputCommandInteraction): unknown;
 	data: ChatInputApplicationCommandData;
 }
 
@@ -25,18 +21,14 @@ export default class Trustybot extends Client {
 
 	constructor() {
 		super({
-			intents: [
-				'Guilds',
-				'GuildMembers',
-				'GuildMessages',
-				'GuildModeration',
-				'MessageContent',
-			],
+			intents: ['Guilds', 'GuildMembers', 'GuildMessages', 'GuildModeration', 'MessageContent']
 		});
 
 		this.loadCommands();
 		this.registerEventListeners();
-		import('../../secrets.json', { with: { type: 'json' } }).then((secrets) => {
+		import(`${process.cwd()}/data/secrets.json`, {
+			with: { type: 'json' }
+		}).then(secrets => {
 			console.log('Trustybot: Imported secrets, logging in...');
 			this.login(secrets.default.discord);
 		});
@@ -54,7 +46,7 @@ export default class Trustybot extends Client {
 
 	loadCommands() {
 		forEachModuleIn(`${import.meta.dirname}/../commands`, async (path, file, name) => {
-			const { data, callback } = this.commands[name] = await import(path);
+			const { data, callback } = (this.commands[name] = await import(path));
 			assert(typeof data === 'object');
 			assert(typeof callback === 'function');
 			data.name = name;
@@ -69,10 +61,7 @@ export default class Trustybot extends Client {
 			this.on(name, callback);
 		});
 
-		process.on(
-			'uncaughtException',
-			(err) => this.handleError(err).then(this.handleExit.bind(this)),
-		);
+		process.on('uncaughtException', err => this.handleError(err).then(this.handleExit.bind(this)));
 		this.on('error', this.handleError.bind(this));
 
 		const handleExitEvent = (x: NodeJS.EventEmitter, v: string) =>

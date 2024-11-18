@@ -1,8 +1,8 @@
 import { AuditLogEvent, GuildMember, TextChannel } from 'discord.js';
-import { makeExecutorEmbedAuthor, msToHighestLevelTime } from '../misc/util.js';
 import assert from 'node:assert';
 import { TbOwned } from '../classes/Trustybot.js';
 import { TbGuild } from '../misc/prototypes.js';
+import { makeExecutorEmbedAuthor, msToHighestLevelTime } from '../misc/util.js';
 
 export default async ({ client: tb, guild, user, joinedTimestamp }: GuildMember & TbOwned) => {
 	const tg = tb.tguilds.get(guild.id);
@@ -25,21 +25,27 @@ export default async ({ client: tb, guild, user, joinedTimestamp }: GuildMember 
 		}
 	}
 
-	channel.send({
-		embeds: [{
-			author: entry?.executor ? makeExecutorEmbedAuthor(entry.executor) : void 0,
-			title: `Member ${action ?? 'left'}`,
-			thumbnail: { url: user.displayAvatarURL() },
-			description: user.toString(),
-			fields: [
-				...(entry?.reason?.length ? [{ name: `Reason`, value: entry.reason.slice(0, 1024) }] : []),
-				...(joinedTimestamp
-					? [{
-						name: 'Membership duration',
-						value: joinedTimestamp ? msToHighestLevelTime(Date.now() - joinedTimestamp) : '(unknown)',
-					}]
-					: []),
-			],
-		}],
-	}).catch(tb.boundHandleError);
+	channel
+		.send({
+			embeds: [
+				{
+					author: entry?.executor ? makeExecutorEmbedAuthor(entry.executor) : void 0,
+					title: `Member ${action ?? 'left'}`,
+					thumbnail: { url: user.displayAvatarURL() },
+					description: user.toString(),
+					fields: [
+						...(entry?.reason?.length ? [{ name: `Reason`, value: entry.reason.slice(0, 1_024) }] : []),
+						...(joinedTimestamp
+							? [
+									{
+										name: 'Membership duration',
+										value: joinedTimestamp ? msToHighestLevelTime(Date.now() - joinedTimestamp) : '(unknown)'
+									}
+								]
+							: [])
+					]
+				}
+			]
+		})
+		.catch(tb.boundHandleError);
 };

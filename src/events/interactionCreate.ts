@@ -1,6 +1,6 @@
 import { Interaction } from 'discord.js';
-import { TbChatInputCommandInteraction, TbOwned } from '../classes/Trustybot.js';
 import assert from 'node:assert';
+import { TbChatInputCommandInteraction, TbOwned } from '../classes/Trustybot.js';
 
 export default async (interaction: Interaction & TbOwned) => {
 	const { client: tb } = interaction;

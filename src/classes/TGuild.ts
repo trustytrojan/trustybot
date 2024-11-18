@@ -1,25 +1,21 @@
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { Collection, EmbedBuilder } from 'discord.js';
-import { TbChatInputCommandInteraction } from './Trustybot.js';
+import { Collection } from 'discord.js';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 export type TGuildData = {
 	embedColor: string;
 	logChannel: string | undefined;
 };
 
-export type ServerSettingsSetter = (
-	value: string,
-	interaction: TbChatInputCommandInteraction,
-	embed: EmbedBuilder,
-) => string;
-
 export default class TGuild {
-	private static readonly PATH = 'tguilds.json';
+	private static readonly PATH = `${process.cwd()}/data/tguilds.json`;
 	embedColor: string;
 	logChannel: string | null;
 
 	public static loadTGuilds(): Collection<string, TGuild> {
 		if (!existsSync(this.PATH)) {
+			if (!existsSync(`${process.cwd()}/data`)) {
+				mkdirSync(`${process.cwd()}/data`);
+			}
 			return new Collection();
 		}
 
@@ -33,9 +29,7 @@ export default class TGuild {
 			throw err;
 		}
 
-		return new Collection(
-			Object.entries(tguilds).map(([k, v]) => [k, new TGuild(v)]),
-		);
+		return new Collection(Object.entries(tguilds).map(([k, v]) => [k, new TGuild(v)]));
 	}
 
 	static saveTGuilds(tguilds: Collection<string, TGuild>) {
