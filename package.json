@@ -1,15 +1,16 @@
 {
 	"dependencies": {
-		"discord.js": "^14.16.3",
-		"pokedex-promise-v2": "^4.2.0",
-		"prettier": "^3.3.3",
-		"typescript": "^5.6.3"
+		"discord.js": "^14.17.2",
+		"pokedex-promise-v2": "^4.2.1",
+		"prettier": "^3.4.2",
+		"typescript": "^5.7.2"
 	},
 	"type": "module",
 	"scripts": {
-		"start": "bash -c 'node dist/src 2>&1 >log & echo $! >pid'",
+		"start": "bash -c 'deno -A dist/index.js 2>&1 >log & echo $! >pid'",
 		"stop": "bash -c 'kill $(<pid)'",
-		"fmt": "prettier --log-level=warn --write './**/*.ts'"
+		"fmt": "prettier --log-level=warn --write './**/*.ts'",
+		"build": "tsc"
 	},
 	"prettier": {
 		"arrowParens": "avoid",

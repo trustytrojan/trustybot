@@ -9,18 +9,15 @@ due to a lack of time/motivation to work on this (i'm years past the discord bot
 phase), nothing worked for a while. but since
 [deno 2.0 released with typescript support out of the box](https://deno.com/blog/v2.0),
 i suddenly gained the motivation to translate all the code here to typescript
-for a better DX... but then the bot never logged in... welp we're going back to
-node and tsc for now!
+for a better DX... but then the bot never logged in when running the typescript files directly... welp, we have to rely on tsc for now! but at long last this is no longer reliant on nodejs/npm!
 
 ## setup
 
--   with deno run `deno install npm:discord.js npm:typescript` (or `npm i` if
-    you're patient)
--   to start up the bot in the background run `deno run start` or `npm start`
--   to stop the bot when started with the `start` task, run `deno run stop` or
-    `npm stop`
+- run `deno install`
+- to start up the bot in the background run `deno task start`
+- to stop the bot when started with the `start` task, run `deno task stop`
 
 ## features
 
--   custom embed color (per server)
--   send audit log events to a text channel (per server)
+- custom embed color (per server)
+- send audit log events to a text channel (per server)
